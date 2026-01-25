@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Media } from "@/lib/api";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Play } from "lucide-react";
 import "glightbox/dist/css/glightbox.min.css";
 
 function GalleryItem({ 
@@ -15,6 +15,7 @@ function GalleryItem({
   className?: string 
 }) {
   const [isError, setIsError] = useState(false);
+  const isVideo = media.type === 'video';
 
   if (isError) {
     return (
@@ -25,31 +26,41 @@ function GalleryItem({
     );
   }
 
-  if (media.type === 'video') {
-    return (
-      <video 
-        src={media.url} 
-        controls 
-        className="w-full h-full object-cover" 
-        onClick={(e) => e.stopPropagation()} 
-        onError={() => setIsError(true)}
-      />
-    );
-  }
-
   return (
     <div 
       onClick={onClick}
-      className="w-full h-full relative group cursor-pointer"
+      className={`w-full h-full relative group cursor-pointer ${className}`}
     >
-      <img
-        src={media.url}
-        alt="Media"
-        loading="lazy"
-        onError={() => setIsError(true)}
-        className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-      />
-      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors pointer-events-none" />
+      {isVideo ? (
+        <video 
+          src={media.url} 
+          className="w-full h-full object-cover" 
+          muted
+          playsInline
+          preload="metadata"
+          onError={() => setIsError(true)}
+        />
+      ) : (
+        <img
+          src={media.url}
+          alt="Media"
+          loading="lazy"
+          onError={() => setIsError(true)}
+          className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+        />
+      )}
+
+      <div className={`absolute inset-0 transition-colors pointer-events-none ${
+        isVideo ? 'bg-black/10 group-hover:bg-black/20' : 'bg-black/0 group-hover:bg-black/10'
+      }`} />
+
+      {isVideo && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/90 dark:bg-black/60 rounded-full flex items-center justify-center backdrop-blur-sm shadow-lg group-hover:scale-110 transition duration-300">
+            <Play size={20} className="fill-black dark:fill-white text-black dark:text-white ml-1" />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -57,12 +68,12 @@ function GalleryItem({
 export default function ImageGallery({ media }: { media: Media[] }) {
   const lightboxRef = useRef<any>(null);
 
-  const lightboxElements = media
-    .filter(m => m.type !== 'video')
-    .map(m => ({
-      href: m.url,
-      type: 'image'
-    }));
+  const lightboxElements = media.map(m => ({
+    href: m.url,
+    type: m.type === 'video' ? 'video' : 'image',
+    width: m.type === 'video' ? '90vw' : undefined, 
+    source: m.type === 'video' ? 'local' : undefined,
+  }));
 
   useEffect(() => {
     let instance: any = null;
@@ -77,9 +88,21 @@ export default function ImageGallery({ media }: { media: Media[] }) {
         draggable: true,
         openEffect: 'zoom', 
         closeEffect: 'zoom',
+        autoplayVideos: true,
+        plyr: {
+          config: {
+            ratio: null, 
+            muted: false,
+            hideControls: true, 
+            fullscreen: { enabled: true, fallback: true, iosNative: true },
+          }
+        },
+        width: 'auto',
+        height: 'auto',
       });
       lightboxRef.current = instance;
     };
+
     if (lightboxElements.length > 0) initLightbox();
     return () => { if (instance) instance.destroy(); };
   }, [media]);
@@ -102,7 +125,6 @@ export default function ImageGallery({ media }: { media: Media[] }) {
   })();
 
   return (
-
     <div className={`grid gap-0.5 rounded-xl overflow-hidden mt-3 border border-gray-200 dark:border-gray-800 ${gridClassName}`}>
       {media.map((m, index) => {
         const isThreeLayout = media.length === 3;
@@ -112,7 +134,7 @@ export default function ImageGallery({ media }: { media: Media[] }) {
           <div key={m.url + index} className={`relative bg-gray-100 dark:bg-gray-900 overflow-hidden ${spanClass}`}>
             <GalleryItem 
               media={m} 
-              onClick={m.type !== 'video' ? () => handleOpenLightbox(m.url) : undefined}
+              onClick={() => handleOpenLightbox(m.url)}
             />
           </div>
         );

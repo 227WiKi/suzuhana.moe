@@ -40,7 +40,8 @@ export default function TweetList({ initialTweets, mediaMap, user }: TweetListPr
   }, [page, initialTweets]);
 
   return (
-    <div className="pb-10 space-y-3">
+
+    <div className="pb-10">
       {displayTweets.map((tweet) => (
         <TweetCard 
           key={tweet.id} 

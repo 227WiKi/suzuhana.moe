@@ -22,7 +22,17 @@ export default function TweetCard({ tweet, mediaMap, user, hideMedia = false }: 
   const displayUser = isRetweet && tweet.rt_info ? tweet.rt_info : user;
 
   return (
-    <article className="bg-white dark:bg-[#16181c] rounded-2xl p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-none hover:shadow-md transition-shadow duration-300 cursor-pointer border border-transparent dark:border-gray-800">
+    <article 
+      className="
+        w-full mb-4 
+        bg-white dark:bg-[#16181c] 
+        rounded-2xl 
+        p-4 
+        shadow-sm hover:shadow-md transition-shadow duration-300 
+        border border-gray-100 dark:border-gray-800
+        cursor-pointer 
+      "
+    >
       
       {isRetweet && (
         <div className="flex items-center gap-2 text-gray-500 text-xs mb-2 ml-12 font-bold">

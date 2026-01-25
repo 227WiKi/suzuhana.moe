@@ -2,6 +2,7 @@
 
 import RichText from '@/components/RichText';
 import ProfileTabs from '@/components/ProfileTabs';
+import { useRef, useState, useEffect } from 'react';
 
 interface TwitterHeaderProps {
   user: any;
@@ -10,9 +11,54 @@ interface TwitterHeaderProps {
 }
 
 export default function TwitterHeader({ user, uniqueTweetsCount, username }: TwitterHeaderProps) {
+  const placeholderRef = useRef<HTMLDivElement>(null);
+  const [headerStyle, setHeaderStyle] = useState<{ left: number; width: number } | null>(null);
+
+  useEffect(() => {
+    const updatePosition = () => {
+      if (placeholderRef.current) {
+        const rect = placeholderRef.current.getBoundingClientRect();
+        setHeaderStyle({
+          left: rect.left,
+          width: rect.width,
+        });
+      }
+    };
+
+    updatePosition();
+    window.addEventListener('resize', updatePosition);
+    window.addEventListener('scroll', updatePosition);
+
+    return () => {
+      window.removeEventListener('resize', updatePosition);
+      window.removeEventListener('scroll', updatePosition);
+    };
+  }, []);
+
   return (
     <>
-      <div className="sticky top-2 z-10 mt-2 bg-white/90 dark:bg-[#16181c]/90 backdrop-blur-md px-4 py-3 rounded-xl shadow-sm border border-white/20 mb-4">
+      <div 
+        ref={placeholderRef} 
+        className="mt-3 mb-4 px-4 py-3 border border-transparent opacity-0 pointer-events-none select-none"
+        aria-hidden="true"
+      >
+        <h1 className="text-xl font-bold leading-none">{user.name}</h1>
+        <p className="text-xs text-gray-500 mt-1">{uniqueTweetsCount} posts</p>
+      </div>
+
+      <div 
+        className={`
+          fixed top-3 z-40 
+          bg-white/90 dark:bg-[#16181c]/90 backdrop-blur-md 
+          px-4 py-3 rounded-xl shadow-sm border border-white/20 
+          transition-opacity duration-150
+          ${headerStyle ? 'opacity-100' : 'opacity-0'}
+        `}
+        style={{
+          left: headerStyle?.left,
+          width: headerStyle?.width,
+        }}
+      >
         <h1 className="text-xl font-bold leading-none">{user.name}</h1>
         <p className="text-xs text-gray-500 mt-1">{uniqueTweetsCount} posts</p>
       </div>

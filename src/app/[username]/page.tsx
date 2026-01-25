@@ -10,9 +10,9 @@ export default async function ProjectHomePage({ params }: { params: Promise<{ us
   const { user } = data;
 
   return (
-    <div className="flex flex-col gap-4 mt-2">
+    <div className="flex flex-col gap-4 mt-3 h-[calc(100vh-24px)] overflow-hidden">
       
-      <div className="relative rounded-2xl overflow-hidden bg-gray-900 shadow-sm h-[400px] group">
+      <div className="flex-1 relative rounded-2xl overflow-hidden bg-gray-900 shadow-sm group min-h-0">
         <img 
           src={user.banner} 
           alt="Hero" 
@@ -35,9 +35,9 @@ export default async function ProjectHomePage({ params }: { params: Promise<{ us
       </div>
 
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* 底部功能区 - 保持不变，作为固定高度的内容被 Flex 布局推到底部 */}
+      <div className="shrink-0 grid grid-cols-1 md:grid-cols-2 gap-4">
         
-
         <Link href={`/${username}/tweets`} className="group relative bg-white dark:bg-[#16181c] p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 hover:shadow-xl transition duration-300 overflow-hidden">
            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition group-hover:scale-110 duration-500">
               <History size={100} />
@@ -77,7 +77,7 @@ export default async function ProjectHomePage({ params }: { params: Promise<{ us
 
       </div>
       
-      <div className="bg-[#008CD2] text-white p-6 rounded-2xl shadow-lg relative overflow-hidden">
+      <div className="shrink-0 bg-[#008CD2] text-white p-6 rounded-2xl shadow-lg relative overflow-hidden">
          <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
                <h3 className="font-bold text-lg flex items-center gap-2">

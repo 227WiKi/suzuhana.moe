@@ -19,11 +19,9 @@ export default async function TwitterLayout({ children, params }: LayoutProps) {
 
   return (
     <>
-
       <TwitterHeader user={user} uniqueTweetsCount={uniqueTweetsCount} username={username} />
 
-
-      <div className="px-2">
+      <div>
         <PageTransition>
           {children}
         </PageTransition>

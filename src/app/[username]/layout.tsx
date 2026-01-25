@@ -23,16 +23,15 @@ export default async function UserLayout({ children, params }: LayoutProps) {
     <div className="min-h-screen bg-[#F9FAFB] dark:bg-black text-gray-900 dark:text-white transition-colors duration-300">
       
       <ProfileEntry>
+
         <div className="container max-w-[1400px] mx-auto flex justify-center items-start gap-4 lg:gap-8 pt-0">
           
           <Sidebar username={username} user={user} allUsers={allUsers} />
 
-          <main className="flex-1 max-w-[640px] min-h-screen pb-20">
-             
+          <main className="flex-1 max-w-[640px]">
              <SectionTransition>
                {children}
              </SectionTransition>
-
           </main>
 
           <RightSection />
