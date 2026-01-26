@@ -48,9 +48,9 @@ export default function RightSection() {
         }}
       >
         <div className="bg-gray-50 dark:bg-[#16181c] border border-gray-200 dark:border-none rounded-xl p-4 mb-4 transition-colors">
-          <h2 className="text-xl font-bold mb-4 text-black dark:text-white">Archive Info</h2>
+          <h2 className="text-xl font-bold mb-4 text-black dark:text-white">About</h2>
           <div className="text-gray-600 dark:text-gray-500 text-sm leading-relaxed">
-            This is a read-only archive for 22/7 members. Data stored locally.
+            22/7 成员社交媒体的数字留档
           </div>
         </div>
 
@@ -62,7 +62,7 @@ export default function RightSection() {
               rel="noopener noreferrer"
               className="hover:text-blue-500 dark:hover:text-blue-400 transition-colors font-medium"
             >
-              Suzuhana Moe Project
+              Project Suzuhana Moe
             </a>
             , part of{' '}
             <span className="inline-flex items-center gap-1 align-bottom">
@@ -74,7 +74,7 @@ export default function RightSection() {
               <span>Project.</span>
             </span>
             <br />
-            © 2026 All rights reserved.
+            © 2026 22/7 WiKi All rights reserved.
           </span>
         </div>
       </div>

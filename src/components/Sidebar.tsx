@@ -81,9 +81,10 @@ export default function Sidebar({ username, user, allUsers, className = "" }: Si
         <div className="px-7 pt-8 pb-6 flex-shrink-0">
           <Link href="/" className="block group select-none">
              <h1 className="text-[20px] font-black leading-tight text-gray-900 dark:text-white group-hover:text-[#008CD2] transition-colors duration-300">
-               Suzuhana Moe
+               Project
                <br />
-               <span className="text-[#008CD2]">Project</span>
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF99CC] to-[#FFCCFF]">
+                  Suzuhana Moe</span>
              </h1>
              <div className="mt-2.5 flex items-center gap-2 opacity-50 group-hover:opacity-100 transition-opacity duration-300">
                <div className="h-px w-3 bg-gray-400 dark:bg-gray-500"></div>
@@ -137,7 +138,7 @@ export default function Sidebar({ username, user, allUsers, className = "" }: Si
                     {allUsers.map((u) => (
                       <Link
                         key={u.screen_name}
-                        href={`/${u.screen_name}`}
+                        href={`/${username}`}
                         onClick={() => setIsSwitcherOpen(false)}
                         className={`flex items-center gap-3 p-2 rounded-xl transition cursor-pointer ${
                             u.screen_name === username 

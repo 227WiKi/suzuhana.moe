@@ -30,7 +30,10 @@ export default async function GlobalLandingPage() {
 
         <div className="hidden sm:flex items-center gap-6 text-sm font-bold text-gray-400">
           <a href="https://227wiki.eu.org" target="_blank" className="hover:text-[#FF99CC] transition-colors">
-            Main Wiki
+            22/7 WiKi
+          </a>
+          <a href="https://github.com/227WiKi/suzuhana.moe" target="_blank" className="hover:text-[#FF99CC] transition-colors">
+            GitHub
           </a>
           <span className="bg-gray-100 dark:bg-[#16181c] px-3 py-1 rounded-full text-xs font-mono flex items-center gap-2">
             <GitCommit size={12} />
@@ -45,28 +48,28 @@ export default async function GlobalLandingPage() {
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pink-50 dark:bg-pink-900/20 text-[#FF6699] text-xs font-bold uppercase tracking-wider mb-6">
               <Database size={14} />
-              <span>Digital Archive System</span>
+              <span>A 22/7 WiKi Project</span>
             </div>
             
             <h1 className="text-5xl sm:text-7xl font-black mb-8 leading-[1.1] tracking-tight">
-              Preserving <br/>
+               What's Project<br/>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF99CC] to-[#FFCCFF]">
-                Moments
+               Suzuhana Moe?
               </span>
             </h1>
             
             <p className="text-xl text-gray-500 dark:text-gray-400 leading-relaxed max-w-lg mb-8">
-              A comprehensive read-only archive dedicated to storing tweets, media, and memories for Project Suzuhana Moe.
+              For 22/7 members, we try our best to save their social media posts and build this website to preserve their digital memories.
             </p>
 
             <div className="flex items-center gap-8 text-sm font-bold text-gray-400">
               <div className="flex items-center gap-2">
                 <Globe size={18} className="text-[#FF99CC]" />
-                <span>Public Access</span>
+                <span>Open Source</span>
               </div>
               <div className="flex items-center gap-2">
                 <History size={18} className="text-[#FF99CC]" />
-                <span>Permanent Storage</span>
+                <span>SNS Backup</span>
               </div>
             </div>
           </div>
@@ -141,7 +144,10 @@ export default async function GlobalLandingPage() {
           
           <div className="text-center md:text-left">
             <h4 className="text-base font-black text-gray-900 dark:text-white leading-none">
-              Project Suzuhana Moe
+              Project<br/> 
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF99CC] to-[#FFCCFF]">
+               Suzuhana Moe
+              </span>
             </h4>
             
             <div className="mt-2.5 flex items-center justify-center md:justify-start gap-2 opacity-60">
