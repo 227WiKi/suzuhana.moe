@@ -37,3 +37,4 @@ export function getMemberBySlug(slug: string): Member | undefined {
 export function getAllMembers(): Member[] {
   return MEMBERS;
 }
+

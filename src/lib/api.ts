@@ -224,3 +224,25 @@ export async function getUsers() {
 
   return results;
 }
+
+export interface TimelineEvent {
+  date: string;
+  title: string;
+  description?: string;
+  type?: 'milestone' | 'release' | 'graduation' | 'default';
+}
+
+export async function getTimeline(slug: string): Promise<TimelineEvent[]> {
+  try {
+    
+    const filePath = path.join(process.cwd(), 'data', slug, 'timeline.json');
+    // 👇 关键修改：使用 fs.promises.readFile
+    // 这样既可以使用 await，又不影响其他函数使用 fs.existsSync
+    const fileContents = await fs.promises.readFile(filePath, 'utf8');
+    
+    return JSON.parse(fileContents);
+  } catch (error) {
+    // 简单的错误处理
+    return [];
+  }
+}

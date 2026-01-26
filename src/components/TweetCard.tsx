@@ -48,6 +48,8 @@ export default function TweetCard({ tweet, user, hideMedia = false }: TweetCardP
 
   return (
     <article 
+      id={`tweet-${tweet.id}`}
+
       className="
         w-full mb-4 
         bg-white dark:bg-[#16181c] 
@@ -56,6 +58,7 @@ export default function TweetCard({ tweet, user, hideMedia = false }: TweetCardP
         shadow-sm hover:shadow-md transition-shadow duration-300 
         border border-gray-100 dark:border-gray-800
         cursor-pointer 
+        scroll-mt-24  
       "
     >
       

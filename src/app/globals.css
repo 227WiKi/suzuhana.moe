@@ -44,6 +44,22 @@
   --foreground: #ededed;
 }
 
+@keyframes flash-highlight {
+  0% {
+    background-color: rgba(0, 140, 210, 0.2);
+    box-shadow: 0 0 0 2px rgba(0, 140, 210, 0.5);
+  }
+
+  100% {
+    background-color: transparent;
+    box-shadow: none;
+  }
+}
+
+:target {
+  animation: flash-highlight 1.5s ease-out forwards;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -56,5 +72,5 @@ body {
   color: var(--foreground);
   font-family: 'LINE Seed JP', "PingFang SC", "Microsoft YaHei", Arial, Helvetica, sans-serif;
   transition: background-color 0.3s ease, color 0.3s ease;
-
+  scroll-behavior: smooth;
 }

@@ -1,0 +1,38 @@
+[
+  {
+    "date": "2016-12-24",
+    "title": "加入 22/7",
+    "description": "通过最终甄选，正式成为 22/7 成员。",
+    "type": "milestone"
+  },
+  {
+    "date": "2018-06",
+    "title": "Twitter 开通",
+    "description": "开通 Twitter 账号。",
+    "type": "sns"
+  },
+  {
+    "date": "2018-09-20",
+    "title": "角色决定",
+    "description": "正式获选担任「神木みかみ」的配音。",
+    "type": "milestone"
+  },
+  {
+    "date": "2021-02-08",
+    "title": "Instagram 开通",
+    "description": "开设 Instagram 账号。",
+    "type": "sns"
+  },
+  {
+    "date": "2024-06-17",
+    "title": "宣布卒業",
+    "description": "宣布将在 Summer Live 2024 结束后毕业。",
+    "type": "graduation"
+  },
+  {
+    "date": "2024-08-31",
+    "title": "正式卒業",
+    "description": "在毕业演唱会后正式结束活动，退出演艺圈。",
+    "type": "graduation"
+  }
+]
