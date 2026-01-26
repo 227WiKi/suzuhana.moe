@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Tweet, Media } from "@/lib/api";
+import { Tweet } from "@/lib/api";
 import TweetCard from "./TweetCard";
 import { Loader2 } from "lucide-react";
 
@@ -9,11 +9,10 @@ const BATCH_SIZE = 20;
 
 interface TweetListProps {
   initialTweets: Tweet[];
-  mediaMap: Record<string, Media>;
   user: any;
 }
 
-export default function TweetList({ initialTweets, mediaMap, user }: TweetListProps) {
+export default function TweetList({ initialTweets, user }: TweetListProps) {
   const [displayTweets, setDisplayTweets] = useState<Tweet[]>([]);
   const [page, setPage] = useState(1);
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -28,6 +27,7 @@ export default function TweetList({ initialTweets, mediaMap, user }: TweetListPr
         setPage((prev) => prev + 1);
       }
     }, { rootMargin: "200px" });
+    
     if (sentinelRef.current) observer.observe(sentinelRef.current);
     return () => observer.disconnect();
   }, [displayTweets.length, initialTweets.length]);
@@ -40,13 +40,11 @@ export default function TweetList({ initialTweets, mediaMap, user }: TweetListPr
   }, [page, initialTweets]);
 
   return (
-
     <div className="pb-10">
       {displayTweets.map((tweet) => (
         <TweetCard 
           key={tweet.id} 
           tweet={tweet} 
-          mediaMap={mediaMap} 
           user={user} 
         />
       ))}
@@ -58,7 +56,7 @@ export default function TweetList({ initialTweets, mediaMap, user }: TweetListPr
       )}
       
       {displayTweets.length > 0 && displayTweets.length === initialTweets.length && (
-        <div className="py-8 text-center text-gray-500 text-sm">
+        <div className="py-8 text-center text-gray-400 text-sm font-medium">
           You've reached the end of the archive.
         </div>
       )}

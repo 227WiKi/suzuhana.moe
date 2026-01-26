@@ -1,27 +1,30 @@
-import { getUserData } from '@/lib/api';
+import { getUserData, getTweets } from '@/lib/api'; 
 import { notFound } from 'next/navigation';
 import TwitterHeader from '@/components/TwitterHeader';
 import PageTransition from '@/components/PageTransition';
 
 interface LayoutProps {
   children: React.ReactNode;
-  params: Promise<{ username: string }>;
+  params: Promise<{ slug: string }>;
 }
 
 export default async function TwitterLayout({ children, params }: LayoutProps) {
-  const { username } = await params;
-  const data = await getUserData(username);
+  const { slug } = await params;
 
-  if (!data) return notFound();
+  const user = await getUserData(slug, 'twitter');
+  const { total } = await getTweets(slug); 
 
-  const { user, tweets } = data;
-  const uniqueTweetsCount = new Set(tweets.map(t => t.id)).size;
+  if (!user) return notFound();
 
   return (
     <>
-      <TwitterHeader user={user} uniqueTweetsCount={uniqueTweetsCount} username={username} />
+      <TwitterHeader 
+        user={user} 
+        uniqueTweetsCount={total} 
+        slug={slug} 
+      />
 
-      <div>
+      <div className="relative z-0">
         <PageTransition>
           {children}
         </PageTransition>

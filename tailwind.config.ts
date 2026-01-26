@@ -8,7 +8,18 @@ const config: Config = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        sans: [
+          '"LINE Seed JP"',       
+          '"PingFang SC"',        
+          '"Hiragino Sans GB"',   
+          '"Microsoft YaHei"',  
+          '"Segoe UI"',    
+          'sans-serif' 
+        ],
+      },
+    },
   },
   plugins: [],
 };

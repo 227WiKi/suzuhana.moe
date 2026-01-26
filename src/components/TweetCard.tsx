@@ -8,17 +8,42 @@ import React from "react";
 
 interface TweetCardProps {
   tweet: Tweet;
-  mediaMap: Record<string, Media>;
   user: any;
   hideMedia?: boolean; 
 }
 
-export default function TweetCard({ tweet, mediaMap, user, hideMedia = false }: TweetCardProps) {
-  const mediaItems = tweet.media.map((id) => mediaMap[id]).filter(Boolean);
+function formatDate(dateString: string | undefined) {
+  if (!dateString) return '';
+
+  let cleanString = dateString;
+  
+  if (dateString.includes(' -')) {
+     cleanString = dateString.split(' -')[0];
+  } else if (dateString.includes(' +')) {
+     cleanString = dateString.split(' +')[0];
+  }
+
+  const safeDateString = cleanString.replace(/-/g, '/');
+
+  const date = new Date(safeDateString);
+
+  if (isNaN(date.getTime())) {
+    return ''; 
+  }
+
+  return new Intl.DateTimeFormat('ja-JP', { 
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(date);
+}
+
+export default function TweetCard({ tweet, user, hideMedia = false }: TweetCardProps) {
+  const mediaItems = tweet.media || [];
 
   const isRetweet = tweet.is_rt && tweet.rt_info?.type !== 'quote';
   const isQuote = tweet.is_rt && tweet.rt_info?.type === 'quote';
-  
+
   const displayUser = isRetweet && tweet.rt_info ? tweet.rt_info : user;
 
   return (
@@ -45,7 +70,7 @@ export default function TweetCard({ tweet, mediaMap, user, hideMedia = false }: 
         <div className="shrink-0">
           <img 
             src={displayUser.avatar} 
-            alt={displayUser.name} 
+            alt={displayUser.nickname || displayUser.name}
             className="w-11 h-11 rounded-full object-cover border border-gray-100 dark:border-gray-700 hover:opacity-90 transition"
             loading="lazy"
             onError={(e) => { e.currentTarget.style.display = 'none'; }}
@@ -55,12 +80,12 @@ export default function TweetCard({ tweet, mediaMap, user, hideMedia = false }: 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 text-[15px] mb-1">
             <span className="font-bold text-black dark:text-white truncate hover:underline text-[16px]">
-              {displayUser.name}
+              {displayUser.nickname || displayUser.name}
             </span>
             <span className="text-gray-500 dark:text-gray-500 text-sm truncate">@{displayUser.screen_name}</span>
-            <span className="text-gray-400 text-xs">●</span>
+            <span className="text-gray-400 px-1">·</span>         
             <time className="text-gray-500 text-sm hover:underline">
-              {tweet.date ? new Date(tweet.date).toLocaleDateString() : ''}
+              {formatDate(tweet.date)}
             </time>
           </div>
 
@@ -71,7 +96,7 @@ export default function TweetCard({ tweet, mediaMap, user, hideMedia = false }: 
             />
           </div>
 
-          {!hideMedia && <ImageGallery media={mediaItems} />}
+          {!hideMedia && mediaItems.length > 0 && <ImageGallery media={mediaItems} />}
 
           {isQuote && tweet.rt_info && (
             <div className="mt-3 border border-gray-200 dark:border-gray-700 rounded-xl p-3 bg-gray-50 dark:bg-black/30 hover:bg-gray-100 dark:hover:bg-black/50 transition overflow-hidden">

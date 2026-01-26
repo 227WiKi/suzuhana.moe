@@ -5,33 +5,42 @@ import RightSection from '@/components/RightSection';
 import FloatingActions from '@/components/FloatingActions';
 import SectionTransition from '@/components/SectionTransition'; 
 import ProfileEntry from '@/components/ProfileEntry';
+import MobileNav from '@/components/MobileNav';
 
 interface LayoutProps {
   children: React.ReactNode;
-  params: Promise<{ username: string }>;
+  params: Promise<{ slug: string }>;
 }
 
-export default async function UserLayout({ children, params }: LayoutProps) {
-  const { username } = await params;
-  const data = await getUserData(username);
+export default async function MemberLayout({ children, params }: LayoutProps) {
+  const { slug } = await params;
+  
+  const data = await getUserData(slug, 'twitter');
   const allUsers = await getUsers();
 
   if (!data) return notFound();
-  const { user } = data;
+  const user = data; 
 
   return (
     <div className="min-h-screen bg-[#F9FAFB] dark:bg-black text-gray-900 dark:text-white transition-colors duration-300">
       
-      <ProfileEntry>
+      <MobileNav slug={slug} user={user} allUsers={allUsers} />
 
+      <ProfileEntry>
         <div className="container max-w-[1400px] mx-auto flex justify-center items-start gap-4 lg:gap-8 pt-0">
           
-          <Sidebar username={username} user={user} allUsers={allUsers} />
+          <div className="hidden lg:block"> 
+             <Sidebar 
+               username={slug} 
+               user={user} 
+               allUsers={allUsers} 
+             />
+          </div>
 
-          <main className="flex-1 max-w-[640px]">
-             <SectionTransition>
-               {children}
-             </SectionTransition>
+          <main className="flex-1 max-w-[640px] pb-10">
+              <SectionTransition>
+                {children}
+              </SectionTransition>
           </main>
 
           <RightSection />

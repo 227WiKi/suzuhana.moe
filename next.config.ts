@@ -1,6 +1,18 @@
 import type { NextConfig } from "next";
+import { execSync } from 'child_process';
 
-const nextConfig: NextConfig = {
+let commitHash = 'dev';
+try {
+  commitHash = execSync('git rev-parse --short HEAD').toString().trim();
+} catch (e) {
+  console.warn('Could not get git commit hash, falling back to "dev"');
+}
+
+
+const nextConfig = {
+  env: {
+    NEXT_PUBLIC_COMMIT_SHA: commitHash,
+  },
   images: {
     remotePatterns: [
       {
@@ -10,7 +22,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'pbs.twimg.com',       // 推特头像域名
+        hostname: 'pbs.twimg.com',      
       },
     ],
   },

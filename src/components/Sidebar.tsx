@@ -10,9 +10,10 @@ interface SidebarProps {
   username: string;
   user: any;
   allUsers: any[];
+  className?: string;
 }
 
-export default function Sidebar({ username, user, allUsers }: SidebarProps) {
+export default function Sidebar({ username, user, allUsers, className = "" }: SidebarProps) {
   const pathname = usePathname();
   const [isSwitcherOpen, setIsSwitcherOpen] = useState(false);
   
@@ -29,7 +30,6 @@ export default function Sidebar({ username, user, allUsers }: SidebarProps) {
     };
 
     updatePosition();
-
     window.addEventListener('resize', updatePosition);
     window.addEventListener('scroll', updatePosition);
 
@@ -74,6 +74,7 @@ export default function Sidebar({ username, user, allUsers }: SidebarProps) {
           bg-white dark:bg-[#16181c] rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm dark:shadow-none z-50
           transition-opacity duration-150
           ${sidebarLeft === null ? 'opacity-0' : 'opacity-100'}
+          ${className}
         `}
       >
         
