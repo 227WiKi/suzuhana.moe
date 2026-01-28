@@ -236,13 +236,33 @@ export async function getTimeline(slug: string): Promise<TimelineEvent[]> {
   try {
     
     const filePath = path.join(process.cwd(), 'data', slug, 'timeline.json');
-    // 👇 关键修改：使用 fs.promises.readFile
-    // 这样既可以使用 await，又不影响其他函数使用 fs.existsSync
+  
     const fileContents = await fs.promises.readFile(filePath, 'utf8');
     
     return JSON.parse(fileContents);
   } catch (error) {
-    // 简单的错误处理
     return [];
   }
+}
+
+export async function getLatestTweetDate(slug: string): Promise<string | undefined> {
+  try {
+    const filePath = path.join(process.cwd(), 'data', slug, 'twitter', 'tweets.json');
+    
+    const fileContents = await fs.promises.readFile(filePath, 'utf8');
+    const tweets = JSON.parse(fileContents);
+
+    if (Array.isArray(tweets) && tweets.length > 0) {
+
+      const latestDate = tweets.reduce((max, tweet) => {
+        if (!tweet.date) return max; 
+        return tweet.date > max ? tweet.date : max;
+      }, tweets[0].date || '2020-01-01');
+
+      return latestDate;
+    } 
+  } catch (error) {
+    return undefined;
+  }
+  return undefined;
 }

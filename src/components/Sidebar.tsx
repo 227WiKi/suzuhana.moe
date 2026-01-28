@@ -6,6 +6,7 @@ import { Home, User, Twitter, Instagram, MoreHorizontal, Check } from 'lucide-re
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+
 interface SidebarProps {
   username: string;
   user: any;

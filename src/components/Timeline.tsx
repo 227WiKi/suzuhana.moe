@@ -32,7 +32,11 @@ export default function Timeline({ events }: { events: TimelineEvent[] }) {
 
         <div className="flex flex-col gap-6">
           {sortedEvents.map((event, index) => (
-            <div key={index} className="relative pl-8 group">
+            <div 
+              key={index} 
+              className="relative pl-8 group opacity-0 animate-fade-in-up"
+              style={{ animationDelay: `${index * 100}ms` }}
+            >
               <div className="absolute left-0 top-1 w-6 h-6 rounded-full bg-white dark:bg-[#16181c] border-2 border-gray-100 dark:border-gray-700 flex items-center justify-center z-10 group-hover:border-[#008CD2] transition-colors">
                 {getIcon(event.type)}
               </div>

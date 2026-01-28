@@ -2,13 +2,15 @@
 
 import { usePathname } from "next/navigation";
 import Timeline from "./Timeline";
+import CalendarWidget from "./CalendarWidget";
 
 interface RightSectionProps {
   events: any[];
   slug: string;
+  lastTweetDate?: string;
 }
 
-export default function RightSection({ events, slug }: RightSectionProps) {
+export default function RightSection({ events, slug, lastTweetDate }: RightSectionProps) {
   const pathname = usePathname();
   const isProfilePage = pathname === `/${slug}` || pathname === `/${slug}/`;
 
@@ -24,8 +26,11 @@ export default function RightSection({ events, slug }: RightSectionProps) {
       `}
     >
       
-      {/* Timeline */}
-      {isProfilePage && <Timeline events={events} />}
+      {isProfilePage ? (
+        <Timeline events={events} />
+      ) : (
+        <CalendarWidget initialDate={lastTweetDate} />
+      )}
 
       {/* About */}
       <div className="bg-gray-50 dark:bg-[#16181c] border border-gray-200 dark:border-none rounded-xl p-4 transition-colors">
