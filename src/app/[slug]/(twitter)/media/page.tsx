@@ -13,10 +13,11 @@ export default async function MediaPage({ params }: PageProps) {
   if (!user) return notFound();
 
 
-  const { tweets } = await getTweets(slug, 1, 10000);
+  const tweetsData = await getTweets(slug);
+  const tweets = Array.isArray(tweetsData) ? tweetsData : [];
 
   const uniqueTweets = Array.from(new Map(tweets.map(item => [item.id, item])).values());
-
+  
   return (
     <MediaGrid 
       tweets={uniqueTweets} 

@@ -12,8 +12,8 @@ export default async function TweetsPage({ params }: PageProps) {
   const user = await getUserData(slug, 'twitter');
   if (!user) return notFound();
 
-  const { tweets } = await getTweets(slug);
-
+  const tweets = await getTweets(slug);
+  
   return (
     <TweetList 
       initialTweets={tweets} 

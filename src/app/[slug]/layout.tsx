@@ -1,4 +1,4 @@
-import { getUsers, getUserData, getTimeline, getLatestTweetDate } from "@/lib/api";import { notFound } from 'next/navigation';
+import { getUsers, getUserData, getTimeline, getTweetDateRange } from "@/lib/api";import { notFound } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
 import RightSection from '@/components/RightSection';
 import FloatingActions from '@/components/FloatingActions';
@@ -14,7 +14,7 @@ interface LayoutProps {
 export default async function MemberLayout({ children, params }: LayoutProps) {
   const { slug } = await params;
   const timelineEvents = await getTimeline(slug);
-  const lastTweetDate = await getLatestTweetDate(slug);
+  const dateRange = await getTweetDateRange(slug);  
   const data = await getUserData(slug, 'twitter');
   const allUsers = await getUsers();
 
@@ -46,7 +46,7 @@ export default async function MemberLayout({ children, params }: LayoutProps) {
           <RightSection 
             events={timelineEvents} 
             slug={slug} 
-            lastTweetDate={lastTweetDate} 
+            dateRange={dateRange}
           />          
         </div>
       </ProfileEntry>

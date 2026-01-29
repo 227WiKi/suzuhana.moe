@@ -7,10 +7,10 @@ import CalendarWidget from "./CalendarWidget";
 interface RightSectionProps {
   events: any[];
   slug: string;
-  lastTweetDate?: string;
+  dateRange: { start: string, end: string } | null;
 }
 
-export default function RightSection({ events, slug, lastTweetDate }: RightSectionProps) {
+export default function RightSection({ events, slug, dateRange }: RightSectionProps) {
   const pathname = usePathname();
   const isProfilePage = pathname === `/${slug}` || pathname === `/${slug}/`;
 
@@ -29,7 +29,10 @@ export default function RightSection({ events, slug, lastTweetDate }: RightSecti
       {isProfilePage ? (
         <Timeline events={events} />
       ) : (
-        <CalendarWidget initialDate={lastTweetDate} />
+        <CalendarWidget 
+          minDate={dateRange?.start} 
+          maxDate={dateRange?.end} 
+        />
       )}
 
       {/* About */}

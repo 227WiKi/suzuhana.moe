@@ -6,11 +6,10 @@ import { useRef, useState, useEffect } from 'react';
 
 interface TwitterHeaderProps {
   user: any;
-  uniqueTweetsCount: number;
   slug: string; 
 }
 
-export default function TwitterHeader({ user, uniqueTweetsCount, slug }: TwitterHeaderProps) {
+export default function TwitterHeader({ user, slug }: TwitterHeaderProps) {
   const placeholderRef = useRef<HTMLDivElement>(null);
   const [headerStyle, setHeaderStyle] = useState<{ left: number; width: number } | null>(null);
 
@@ -36,7 +35,9 @@ export default function TwitterHeader({ user, uniqueTweetsCount, slug }: Twitter
   }, []);
 
   const displayName = user.nickname || user.name;
-
+  const tweetCount = user.stats?.tweets || 0;
+  const followingCount = user.stats?.following || 0;
+  const followersCount = user.stats?.followers || 0;
   return (
     <>
 
@@ -66,7 +67,7 @@ export default function TwitterHeader({ user, uniqueTweetsCount, slug }: Twitter
       >
         <div className="flex flex-col">
           <h1 className="text-xl font-bold leading-none truncate">{displayName}</h1>
-          <p className="text-xs text-gray-500 mt-1">{uniqueTweetsCount} posts</p>
+          <p className="text-xs text-gray-500 mt-1">{tweetCount} posts</p>
         </div>
       </div>
 
