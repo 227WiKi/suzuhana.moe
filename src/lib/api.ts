@@ -1,8 +1,4 @@
-import fs from 'fs';
-import path from 'path';
 import { getMemberBySlug, getAllMembers } from './members';
-
-const DATA_DIR = path.join(process.cwd(), 'data');
 
 export interface Media {
   type: 'photo' | 'video';
@@ -53,32 +49,26 @@ export interface ProfileData {
   };
 }
 
-function getPlatformDir(slug: string, platform: string) {
-  return path.join(DATA_DIR, slug, platform);
-}
-
 export async function getUserData(slug: string, platform: 'twitter' | 'instagram' = 'twitter') {
   const member = getMemberBySlug(slug);
   if (!member) return null;
 
-  const dir = getPlatformDir(slug, platform);
-  const filePath = path.join(dir, 'user.json');
-  const tweetsPath = path.join(dir, 'tweets.json');
-
   try {
     let platformUser: any = {};
-    
-    if (fs.existsSync(filePath)) {
-      const fileContents = fs.readFileSync(filePath, 'utf-8');
-      platformUser = JSON.parse(fileContents);
+    try {
+      // @ts-ignore
+      const userModule = await import(`../../data/${slug}/${platform}/user.json`);
+      platformUser = userModule.default || userModule;
+    } catch (e) {
+      console.warn(`User data not found for ${slug}, using defaults.`);
     }
 
     let realTweetCount = platformUser.stats?.tweets || 0;
-    
-    if (platform === 'twitter' && fs.existsSync(tweetsPath)) {
+    if (platform === 'twitter') {
       try {
-        const tweetsRaw = fs.readFileSync(tweetsPath, 'utf-8');
-        const tweetsData = JSON.parse(tweetsRaw);
+        // @ts-ignore
+        const tweetsModule = await import(`../../data/${slug}/twitter/tweets.json`);
+        const tweetsData = tweetsModule.default || tweetsModule;
         
         if (Array.isArray(tweetsData)) {
           realTweetCount = tweetsData.length;
@@ -86,7 +76,6 @@ export async function getUserData(slug: string, platform: 'twitter' | 'instagram
           realTweetCount = tweetsData.tweets.length;
         }
       } catch (e) {
-        console.error(`Error counting tweets for ${slug}:`, e);
       }
     }
 
@@ -108,34 +97,25 @@ export async function getUserData(slug: string, platform: 'twitter' | 'instagram
     };
 
   } catch (error) {
-    console.error(`Error loading user data:`, error);
+    console.error(`Error loading user data for ${slug}:`, error);
     return null;
   }
 }
 
 export async function getTweets(slug: string): Promise<Tweet[]> {
-  const dir = getPlatformDir(slug, 'twitter');
-  const tweetsPath = path.join(dir, 'tweets.json');
-  const mediaMapPath = path.join(dir, 'media_map.json'); 
-
   try {
-    if (!fs.existsSync(tweetsPath)) {
-      return [];
-    }
-
-    const tweetsRaw = await fs.promises.readFile(tweetsPath, 'utf-8');
-    const allTweets = JSON.parse(tweetsRaw);
+    // @ts-ignore
+    const tweetsModule = await import(`../../data/${slug}/twitter/tweets.json`);
+    const allTweets = tweetsModule.default || tweetsModule;
     
     const tweetsArray = Array.isArray(allTweets) ? allTweets : (allTweets.tweets || []);
 
     let mediaMap: Record<string, any> = {};
-    if (fs.existsSync(mediaMapPath)) {
-      try {
-        const mediaMapRaw = await fs.promises.readFile(mediaMapPath, 'utf-8');
-        mediaMap = JSON.parse(mediaMapRaw);
-      } catch (e) {
-        console.error("Error parsing media_map.json", e);
-      }
+    try {
+      // @ts-ignore
+      const mapModule = await import(`../../data/${slug}/twitter/media_map.json`);
+      mediaMap = mapModule.default || mapModule;
+    } catch (e) {
     }
 
     const processedTweets = tweetsArray.map((t: any) => {
@@ -169,52 +149,42 @@ export async function getTweets(slug: string): Promise<Tweet[]> {
     return processedTweets;
 
   } catch (error) {
-    console.error(`Error loading tweets for ${slug}:`, error);
+    console.warn(`No tweets found for ${slug}`);
     return [];
   }
 }
 
 export async function getMedia(slug: string) {
   const tweets = await getTweets(slug); 
-  
   let mediaList: Media[] = [];
-  
   tweets.forEach((t: Tweet) => {
      if (t.media && t.media.length > 0) {
        mediaList.push(...t.media);
      }
   });
-
   return mediaList;
 }
 
 export async function getProfile(slug: string): Promise<ProfileData | null> {
-  const profilePath = path.join(process.cwd(), 'data', slug, 'profile.json');
-
   try {
-    if (fs.existsSync(profilePath)) {
-      const fileContents = fs.readFileSync(profilePath, 'utf-8');
-      return JSON.parse(fileContents);
-    }
+    // @ts-ignore
+    const profileModule = await import(`../../data/${slug}/profile.json`);
+    return profileModule.default || profileModule;
   } catch (error) {
-    console.error(`Error loading profile for ${slug}:`, error);
+    return null;
   }
-  return null;
 }
 
 export async function getUsers() {
   const members = getAllMembers();
 
-  const results = members.map((member) => {
-    const dir = getPlatformDir(member.slug, 'twitter');
-    const userPath = path.join(dir, 'user.json');
-    
+  const results = await Promise.all(members.map(async (member) => {
     let twitterData: any = {};
-    if (fs.existsSync(userPath)) {
-      try {
-        twitterData = JSON.parse(fs.readFileSync(userPath, 'utf-8'));
-      } catch (e) { }
-    }
+    try {
+      // @ts-ignore
+      const userModule = await import(`../../data/${member.slug}/twitter/user.json`);
+      twitterData = userModule.default || userModule;
+    } catch (e) { }
 
     return {
       slug: member.slug,
@@ -223,18 +193,16 @@ export async function getUsers() {
       avatar: twitterData.avatar || twitterData.profile_image_url_https || member.avatar,
       bio: member.bio || twitterData.bio || twitterData.description || ""
     };
-  });
+  }));
 
   return results;
 }
 
 export async function getTimeline(slug: string): Promise<TimelineEvent[]> {
   try {
-    const filePath = path.join(process.cwd(), 'data', slug, 'timeline.json');
-    if (!fs.existsSync(filePath)) return [];
-    
-    const fileContents = await fs.promises.readFile(filePath, 'utf8');
-    return JSON.parse(fileContents);
+    // @ts-ignore
+    const timelineModule = await import(`../../data/${slug}/timeline.json`);
+    return timelineModule.default || timelineModule;
   } catch (error) {
     return [];
   }
@@ -242,11 +210,9 @@ export async function getTimeline(slug: string): Promise<TimelineEvent[]> {
 
 export async function getTweetDateRange(slug: string): Promise<{ start: string, end: string } | null> {
   try {
-    const filePath = path.join(process.cwd(), 'data', slug, 'twitter', 'tweets.json');
-    if (!fs.existsSync(filePath)) return null;
-
-    const fileContents = await fs.promises.readFile(filePath, 'utf8');
-    const tweets = JSON.parse(fileContents);
+    // @ts-ignore
+    const tweetsModule = await import(`../../data/${slug}/twitter/tweets.json`);
+    const tweets = tweetsModule.default || tweetsModule;
     const tweetsArray = Array.isArray(tweets) ? tweets : (tweets.tweets || []);
 
     if (tweetsArray.length > 0) {
@@ -265,7 +231,7 @@ export async function getTweetDateRange(slug: string): Promise<{ start: string, 
       };
     }
   } catch (error) {
-    console.error("Error getting date range:", error);
+    return null;
   }
   return null;
 }

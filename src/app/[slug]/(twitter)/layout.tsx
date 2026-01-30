@@ -1,6 +1,7 @@
 import { getUserData } from '@/lib/api';
 import { notFound } from 'next/navigation';
 import TwitterHeader from '@/components/TwitterHeader';
+import PageTransition from "@/components/PageTransition";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -17,15 +18,16 @@ export default async function TwitterLayout({ children, params }: LayoutProps) {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black">
+    <div className="min-h-screen">
       <div className="max-w-[600px] mx-auto min-h-screen border-x border-gray-100 dark:border-gray-800">
         
         <TwitterHeader 
           user={user} 
           slug={slug} 
         />
-
+      <PageTransition >
         {children}
+      </PageTransition >
       </div>
     </div>
   );
