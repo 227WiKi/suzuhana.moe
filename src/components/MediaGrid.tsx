@@ -140,13 +140,13 @@ export default function MediaGrid({ tweets = [], user }: MediaGridProps) {
       });
 
       instance = GLightbox({ 
-          elements: allLightboxElements, 
+          elements: allLightboxElements as any, 
           touchNavigation: true, 
           loop: false, 
           zoomable: true, 
           draggable: true, 
           autoplayVideos: true, 
-          plyr: { config: { ratio: null, muted: false, hideControls: true } } 
+          plyr: { config: { ratio: null as any} } 
       });
       
       instance.on('slide_changed', (data: any) => {

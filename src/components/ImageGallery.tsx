@@ -81,7 +81,7 @@ export default function ImageGallery({ media }: { media: Media[] }) {
       const module = await import("glightbox");
       const GLightbox = module.default;
       instance = GLightbox({
-        elements: lightboxElements,
+        elements: lightboxElements as any,
         touchNavigation: true,
         loop: false,
         zoomable: true,
@@ -91,10 +91,8 @@ export default function ImageGallery({ media }: { media: Media[] }) {
         autoplayVideos: true,
         plyr: {
           config: {
-            ratio: null, 
-            muted: false,
-            hideControls: true, 
-            fullscreen: { enabled: true, fallback: true, iosNative: true },
+            ratio: null as any, 
+            fullscreen: { enabled: true, iosNative: true },
           }
         },
         width: 'auto',

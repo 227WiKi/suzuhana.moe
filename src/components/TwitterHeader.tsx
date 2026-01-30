@@ -47,7 +47,7 @@ export default function TwitterHeader({ user, slug }: TwitterHeaderProps) {
         aria-hidden="true"
       >
         <h1 className="text-xl font-bold leading-none">{displayName}</h1>
-        <p className="text-xs text-gray-500 mt-1">{uniqueTweetsCount} posts</p>
+        <p className="text-xs text-gray-500 mt-1">{tweetCount} posts</p>
       </div>
 
 
