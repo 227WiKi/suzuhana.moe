@@ -1,26 +1,41 @@
-"use client";
+import { getInstagramPosts, getUserData } from "@/lib/api";
+import { notFound } from "next/navigation";
+import InstagramGrid from "@/components/InstagramGrid";
+import { Grid } from "lucide-react";
 
-import { Construction } from 'lucide-react';
-import { motion } from 'framer-motion';
+interface PageProps {
+  params: Promise<{ slug: string }>; 
+}
 
-export default function InstagramPage() {
+export default async function InstagramPage({ params }: PageProps) {
+  const resolvedParams = await params;
+  const username = resolvedParams.slug;
+
+  if (!username) {
+    console.error("Can't get slug from router");
+    return notFound();
+  }
+
+  const [userData, posts] = await Promise.all([
+    getUserData(username, 'instagram'),
+    getInstagramPosts(username)
+  ]);
+
+  if (!userData) {
+    console.warn(`Can't find user data: ${username}`);
+    return notFound();
+  }
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-8">
-      <motion.div
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.5, type: "spring" }}
-        className="bg-gradient-to-tr from-yellow-400 to-orange-500 p-6 rounded-3xl shadow-xl mb-6"
-      >
-        <Construction size={64} className="text-white" />
-      </motion.div>
-      <h1 className="text-3xl font-black mb-2 text-gray-800 dark:text-gray-100">
-        Instagram
-      </h1>
-      <p className="text-gray-500 dark:text-gray-400 text-lg font-medium max-w-md">
-        This section is currently under development. <br/>
-        Please check back later for updates!
-      </p>
+    <div className="w-full">
+      <div className="flex items-center gap-2 px-4 py-4 mb-2 border-b border-gray-100 dark:border-gray-800">
+         <Grid size={18} className="text-gray-900 dark:text-white" />
+         <h2 className="text-sm font-bold uppercase tracking-widest text-gray-500">
+            {posts.length} Posts
+         </h2>
+      </div>
+
+      <InstagramGrid posts={posts} />
     </div>
   );
 }

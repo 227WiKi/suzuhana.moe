@@ -49,6 +49,13 @@ export interface ProfileData {
   };
 }
 
+export interface InstagramPost {
+  id: string;
+  date: string;
+  text: string;
+  images: string[];
+}
+
 export async function getUserData(slug: string, platform: 'twitter' | 'instagram' = 'twitter') {
   const member = getMemberBySlug(slug);
   if (!member) return null;
@@ -63,20 +70,35 @@ export async function getUserData(slug: string, platform: 'twitter' | 'instagram
       console.warn(`User data not found for ${slug}, using defaults.`);
     }
 
-    let realTweetCount = platformUser.stats?.tweets || 0;
-    if (platform === 'twitter') {
-      try {
+    let realPostCount = 0;
+    
+    if (platformUser.stats) {
+      realPostCount = platformUser.stats.tweets || platformUser.stats.posts || 0;
+    }
+
+    try {
+      if (platform === 'twitter') {
         // @ts-ignore
         const tweetsModule = await import(`../../data/${slug}/twitter/tweets.json`);
         const tweetsData = tweetsModule.default || tweetsModule;
         
         if (Array.isArray(tweetsData)) {
-          realTweetCount = tweetsData.length;
+          realPostCount = tweetsData.length;
         } else if (tweetsData.tweets && Array.isArray(tweetsData.tweets)) {
-          realTweetCount = tweetsData.tweets.length;
+          realPostCount = tweetsData.tweets.length;
         }
-      } catch (e) {
+      } else if (platform === 'instagram') {
+        // @ts-ignore
+        const postsModule = await import(`../../data/${slug}/instagram/posts.json`);
+        const postsData = postsModule.default || postsModule;
+
+        if (Array.isArray(postsData)) {
+          realPostCount = postsData.length;
+        } else if (postsData.posts && Array.isArray(postsData.posts)) {
+          realPostCount = postsData.posts.length;
+        }
       }
+    } catch (e) {
     }
 
     return {
@@ -87,9 +109,9 @@ export async function getUserData(slug: string, platform: 'twitter' | 'instagram
       avatar: platformUser.avatar || platformUser.profile_image_url_https || member.avatar,
       banner: platformUser.banner || platformUser.profile_banner_url || null,
       bio: platformUser.bio || platformUser.description || member.bio || "",
-      screen_name: platformUser.screen_name || member.accounts.twitter,
+      screen_name: platformUser.screen_name || member.accounts[platform] || member.accounts.twitter,
       stats: {
-        tweets: realTweetCount,
+        tweets: realPostCount,
         following: platformUser.stats?.following || 0,
         followers: platformUser.stats?.followers || 0,
       },
@@ -234,4 +256,25 @@ export async function getTweetDateRange(slug: string): Promise<{ start: string, 
     return null;
   }
   return null;
+}
+
+export async function getInstagramPosts(slug: string): Promise<InstagramPost[]> {
+  try {
+    // @ts-ignore
+    const postsModule = await import(`../../data/${slug}/instagram/posts.json`);
+    const postsData = postsModule.default || postsModule;
+
+    let posts: InstagramPost[] = [];
+
+    if (Array.isArray(postsData)) {
+      posts = postsData;
+    } else if (postsData.posts && Array.isArray(postsData.posts)) {
+      posts = postsData.posts;
+    }
+    return posts.sort((a, b) => b.id.localeCompare(a.id));
+
+  } catch (error) {
+    console.warn(`Instagram posts not found for ${slug}`);
+    return [];
+  }
 }
