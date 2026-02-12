@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-
+import FloatingActions from "@/components/FloatingActions";
 
 
 export const metadata: Metadata = {
@@ -13,6 +13,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ja">
       <body className="font-sans antialiased bg-[#F9FAFB] dark:bg-black text-gray-900 dark:text-white">
         {children}
+
+        <FloatingActions />
       </body>
     </html>
   );

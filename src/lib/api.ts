@@ -67,13 +67,15 @@ export async function getUserData(slug: string, platform: 'twitter' | 'instagram
       const userModule = await import(`../../data/${slug}/${platform}/user.json`);
       platformUser = userModule.default || userModule;
     } catch (e) {
-      console.warn(`User data not found for ${slug}, using defaults.`);
+      console.warn(`[API] User data not found for ${slug} on ${platform}`);
     }
 
     let realPostCount = 0;
     
     if (platformUser.stats) {
-      realPostCount = platformUser.stats.tweets || platformUser.stats.posts || 0;
+      realPostCount = platformUser.stats.tweets || 
+                      platformUser.stats.posts || 
+                      platformUser.stats.statuses_count || 0;
     }
 
     try {
@@ -81,10 +83,9 @@ export async function getUserData(slug: string, platform: 'twitter' | 'instagram
         // @ts-ignore
         const tweetsModule = await import(`../../data/${slug}/twitter/tweets.json`);
         const tweetsData = tweetsModule.default || tweetsModule;
-        
         if (Array.isArray(tweetsData)) {
           realPostCount = tweetsData.length;
-        } else if (tweetsData.tweets && Array.isArray(tweetsData.tweets)) {
+        } else if (tweetsData && Array.isArray(tweetsData.tweets)) {
           realPostCount = tweetsData.tweets.length;
         }
       } else if (platform === 'instagram') {
@@ -94,7 +95,7 @@ export async function getUserData(slug: string, platform: 'twitter' | 'instagram
 
         if (Array.isArray(postsData)) {
           realPostCount = postsData.length;
-        } else if (postsData.posts && Array.isArray(postsData.posts)) {
+        } else if (postsData && Array.isArray(postsData.posts)) {
           realPostCount = postsData.posts.length;
         }
       }
@@ -106,12 +107,13 @@ export async function getUserData(slug: string, platform: 'twitter' | 'instagram
       name: member.name, 
       nickname: platformUser.name || member.name, 
       platform: platform,
-      avatar: platformUser.avatar || platformUser.profile_image_url_https || member.avatar,
+      avatar: platformUser.avatar || platformUser.profile_image_url_https || platformUser.profile_pic_url || member.avatar,
       banner: platformUser.banner || platformUser.profile_banner_url || null,
       bio: platformUser.bio || platformUser.description || member.bio || "",
       screen_name: platformUser.screen_name || member.accounts[platform] || member.accounts.twitter,
       stats: {
         tweets: realPostCount,
+        posts: realPostCount,
         following: platformUser.stats?.following || 0,
         followers: platformUser.stats?.followers || 0,
       },

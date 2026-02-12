@@ -35,7 +35,7 @@ export default async function InstagramPage({ params }: PageProps) {
          </h2>
       </div>
 
-      <InstagramGrid posts={posts} />
+      <InstagramGrid posts={posts} userData={userData} />
     </div>
   );
 }
