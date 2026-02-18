@@ -46,6 +46,7 @@ export interface ProfileData {
   assets: {
     formula: string;
     signature: string;
+    type?: 'vertical' | 'horizontal'; 
   };
 }
 
@@ -215,7 +216,8 @@ export async function getUsers() {
       name: member.name,
       screen_name: member.accounts.twitter,
       avatar: twitterData.avatar || twitterData.profile_image_url_https || member.avatar,
-      bio: member.bio || twitterData.bio || twitterData.description || ""
+      bio: member.bio || twitterData.bio || twitterData.description || "",
+      accounts: member.accounts
     };
   }));
 

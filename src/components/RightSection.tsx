@@ -12,13 +12,14 @@ interface RightSectionProps {
 
 export default function RightSection({ events, slug, dateRange }: RightSectionProps) {
   const pathname = usePathname();
+  
   const isProfilePage = pathname === `/${slug}` || pathname === `/${slug}/`;
+  const isInstagramPage = pathname.includes(`/${slug}/instagram`);
 
   return (
     <div 
       className={`
         hidden lg:flex flex-col w-[350px] shrink-0 gap-4 h-fit
-        
         ${isProfilePage 
           ? 'mt-4' 
           : 'sticky top-4' 
@@ -28,6 +29,8 @@ export default function RightSection({ events, slug, dateRange }: RightSectionPr
       
       {isProfilePage ? (
         <Timeline events={events} />
+      ) : isInstagramPage ? (
+        null
       ) : (
         <CalendarWidget 
           minDate={dateRange?.start} 
@@ -35,7 +38,6 @@ export default function RightSection({ events, slug, dateRange }: RightSectionPr
         />
       )}
 
-      {/* About */}
       <div className="bg-gray-50 dark:bg-[#16181c] border border-gray-200 dark:border-none rounded-xl p-4 transition-colors">
         <h2 className="text-xl font-bold mb-4 text-black dark:text-white">About</h2>
         <div className="text-gray-600 dark:text-gray-500 text-sm leading-relaxed">
@@ -43,7 +45,6 @@ export default function RightSection({ events, slug, dateRange }: RightSectionPr
         </div>
       </div>
 
-      {/* Footer */}
       <div className="text-center text-sm text-gray-500 dark:text-gray-400 px-4 leading-relaxed">
         <span>
           <a

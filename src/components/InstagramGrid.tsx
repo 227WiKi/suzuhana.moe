@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Layers, X, ChevronLeft, ChevronRight, Loader2, Play, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import RichText from "@/components/RichText";
 
 interface InstagramPost {
   id: string;
@@ -214,7 +215,11 @@ export default function InstagramGrid({ posts, userData }: InstagramGridProps) {
                         <span className="font-bold mr-2 text-gray-900 dark:text-white">
                           {userData.screen_name}
                         </span>
-                        {selectedPost.text}
+                        <RichText 
+                          text={selectedPost.text} 
+                          platform="instagram"
+                          className="inline"
+                        />
                       </p>
                       <time className="text-[10px] font-mono text-gray-400 uppercase tracking-widest">
                         {selectedPost.date}
