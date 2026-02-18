@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { getUsers } from '@/lib/api';
-import { ArrowRight, Database, Users, Globe, History, GitCommit } from 'lucide-react';
+import { Twitter, Instagram, ArrowRight, Database, Users, Globe, History, GitCommit } from 'lucide-react';
 import HomeEntry from '@/components/HomeEntry';
 
 export default async function GlobalLandingPage() {
@@ -123,14 +123,26 @@ export default async function GlobalLandingPage() {
                     </p>
                   </div>
 
-                  <div className="pt-6 border-t border-gray-50 dark:border-gray-800/50 flex items-center gap-4 text-xs font-bold text-gray-400 uppercase tracking-wider">
-                      <span className="flex items-center gap-1.5">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[]"></div>
-                        Tweets
-                      </span>
+                  <div className="pt-6 border-t border-gray-50 dark:border-gray-800/50 flex items-center gap-4">
+                      <div className="flex items-center gap-3">
+                        {/* Twitter 图标 (通常必有) */}
+                        {user.accounts?.twitter && (
+                          <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                            <Twitter size={12} className="text-[#1d9bf0]" />
+                            <span>X / Twitter</span>
+                          </div>
+                        )}
 
+                        {/* Instagram 图标 (条件显示) */}
+                        {user.accounts?.instagram && (
+                          <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                            <div className="w-[1px] h-3 bg-gray-200 dark:bg-gray-800 mx-1"></div>
+                            <Instagram size={12} className="text-pink-500" />
+                            <span>Instagram</span>
+                          </div>
+                        )}
+                      </div>
                   </div>
-
                 </div>
               </Link>
             ))}

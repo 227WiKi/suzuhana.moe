@@ -1,4 +1,5 @@
-import { getUsers, getUserData, getTimeline, getTweetDateRange } from "@/lib/api";import { notFound } from 'next/navigation';
+import { getUsers, getUserData, getTimeline, getTweetDateRange } from "@/lib/api"; // 👈 修复：确保这一行存在
+import { notFound } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
 import RightSection from '@/components/RightSection';
 import FloatingActions from '@/components/FloatingActions';
@@ -13,6 +14,7 @@ interface LayoutProps {
 
 export default async function MemberLayout({ children, params }: LayoutProps) {
   const { slug } = await params;
+  
   const timelineEvents = await getTimeline(slug);
   const dateRange = await getTweetDateRange(slug);  
   const data = await getUserData(slug, 'twitter');
@@ -22,20 +24,23 @@ export default async function MemberLayout({ children, params }: LayoutProps) {
   const user = data; 
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB] dark:bg-black text-gray-900 dark:text-white transition-colors duration-300">
+    <div 
+      className="min-h-screen bg-[#F9FAFB] dark:bg-black text-gray-900 dark:text-white transition-colors duration-300" 
+      style={{ scrollbarGutter: 'stable' }} // 👈 核心：防止滚动条出现引起的布局抖动
+    >
       
       <MobileNav slug={slug} user={user} allUsers={allUsers} />
 
       <ProfileEntry>
-        <div className="container max-w-[1400px] mx-auto flex justify-center items-start gap-4 lg:gap-8 pt-0">
+        <div className="container max-w-[1400px] mx-auto flex justify-center items-start gap-8 pt-0 px-4">
           
-          <div className="hidden lg:block"> 
+          <aside className="hidden lg:block flex-shrink-0 sticky top-3 self-start z-40"> 
              <Sidebar 
                username={slug} 
                user={user} 
                allUsers={allUsers} 
              />
-          </div>
+          </aside>
 
           <main className="flex-1 max-w-[640px] pb-10">
               <SectionTransition>

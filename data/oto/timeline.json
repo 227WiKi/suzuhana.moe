@@ -1,0 +1,27 @@
+[
+  {
+    "date": "2021",
+    "title": "加入 22/7",
+    "description": "报名参加22/7二期生甄选并合格",
+    "type": "milestone"
+  },
+  {
+    "date": "2022-02-27",
+    "title": "初次亮相",
+    "description": "在ナナニジ House中初次亮相",
+    "type": "milestone"
+  },
+  {
+    "date": "2022-04-20",
+    "title": "角色决定",
+    "description": "4月20日在“14”东京追加公演上宣布为八神叶爱配音",
+    "type": "milestone"
+  },
+
+  {
+    "date": "2023-08-25",
+    "title": "宣布卒業",
+    "description": "因为难以兼顾偶像事业与学业，加上母亲患病，决定在八月底停止22/7的活动。",
+    "type": "graduation"
+  }
+]

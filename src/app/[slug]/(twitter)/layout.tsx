@@ -19,7 +19,7 @@ export default async function TwitterLayout({ children, params }: LayoutProps) {
 
   return (
     <div className="min-h-screen">
-      <div className="max-w-[600px] mx-auto min-h-screen border-x border-gray-100 dark:border-gray-800">
+      <div className="max-w-[600px] mx-auto min-h-screen border-gray-100 dark:border-gray-800">
         
         <TwitterHeader 
           user={user} 

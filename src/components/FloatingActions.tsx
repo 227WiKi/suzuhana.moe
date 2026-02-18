@@ -12,10 +12,17 @@ export default function FloatingActions() {
     setMounted(true);
     
     const savedTheme = localStorage.getItem("theme");
-    const isDark = savedTheme === "dark" || (!savedTheme && true); 
-    setIsDarkMode(isDark);
+    let initialDarkState;
+
+    if (savedTheme) {
+      initialDarkState = savedTheme === "dark";
+    } else {
+      initialDarkState = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
     
-    if (isDark) {
+    setIsDarkMode(initialDarkState);
+    
+    if (initialDarkState) {
       document.documentElement.classList.add("dark");
     } else {
       document.documentElement.classList.remove("dark");
