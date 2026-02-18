@@ -231,7 +231,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ slug: 
           </Link>
         )}
 
-        <Link href={blogUrl} className="group bg-white dark:bg-[#16181c] p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 relative overflow-hidden flex flex-col justify-between h-48 sm:h-64">
+        <Link href={blogUrl!} className="group bg-white dark:bg-[#16181c] p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 relative overflow-hidden flex flex-col justify-between h-48 sm:h-64">
            <div className="absolute -top-4 -right-4 text-gray-100 dark:text-emerald-500/5 group-hover:scale-110 transition-transform">
              <BookOpen size={140} strokeWidth={1} />
            </div>
