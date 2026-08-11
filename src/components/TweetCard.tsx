@@ -1,16 +1,21 @@
 "use client";
 
-import { Tweet, Media } from "@/lib/api";
+import type { ArchiveUser, Tweet } from "@/lib/api";
 import ImageGallery from "./ImageGallery";
 import RichText from "./RichText";
 import { MessageCircle, Repeat, Heart } from "lucide-react";
-import React from "react";
 
 interface TweetCardProps {
   tweet: Tweet;
-  user: any;
+  user: ArchiveUser;
   hideMedia?: boolean; 
 }
+
+const dateFormatter = new Intl.DateTimeFormat('ja-JP', {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+});
 
 function formatDate(dateString: string | undefined) {
   if (!dateString) return '';
@@ -31,11 +36,7 @@ function formatDate(dateString: string | undefined) {
     return ''; 
   }
 
-  return new Intl.DateTimeFormat('ja-JP', { 
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(date);
+  return dateFormatter.format(date);
 }
 
 export default function TweetCard({ tweet, user, hideMedia = false }: TweetCardProps) {
@@ -45,6 +46,7 @@ export default function TweetCard({ tweet, user, hideMedia = false }: TweetCardP
   const isQuote = tweet.is_rt && tweet.rt_info?.type === 'quote';
 
   const displayUser = isRetweet && tweet.rt_info ? tweet.rt_info : user;
+  const displayName = "nickname" in displayUser ? displayUser.nickname : displayUser.name;
 
   return (
     <article 
@@ -73,7 +75,7 @@ export default function TweetCard({ tweet, user, hideMedia = false }: TweetCardP
         <div className="shrink-0">
           <img 
             src={displayUser.avatar} 
-            alt={displayUser.nickname || displayUser.name}
+            alt={displayName}
             className="w-11 h-11 rounded-full object-cover border border-gray-100 dark:border-gray-700 hover:opacity-90 transition"
             loading="lazy"
             onError={(e) => { e.currentTarget.style.display = 'none'; }}
@@ -83,7 +85,7 @@ export default function TweetCard({ tweet, user, hideMedia = false }: TweetCardP
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 text-[15px] mb-1">
             <span className="font-bold text-black dark:text-white truncate hover:underline text-[16px]">
-              {displayUser.nickname || displayUser.name}
+              {displayName}
             </span>
             <span className="text-gray-500 dark:text-gray-500 text-sm truncate">@{displayUser.screen_name}</span>
             <span className="text-gray-400 px-1">·</span>         

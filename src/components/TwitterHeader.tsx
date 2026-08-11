@@ -3,9 +3,10 @@
 import RichText from '@/components/RichText';
 import ProfileTabs from '@/components/ProfileTabs';
 import { useRef, useState, useEffect } from 'react';
+import type { ArchiveUser } from '@/lib/api';
 
 interface TwitterHeaderProps {
-  user: any;
+  user: ArchiveUser;
   slug: string; 
 }
 
@@ -17,27 +18,25 @@ export default function TwitterHeader({ user, slug }: TwitterHeaderProps) {
     const updatePosition = () => {
       if (placeholderRef.current) {
         const rect = placeholderRef.current.getBoundingClientRect();
-        setHeaderStyle({
-          left: rect.left,
-          width: rect.width,
+        setHeaderStyle((current) => {
+          if (current?.left === rect.left && current.width === rect.width) return current;
+          return { left: rect.left, width: rect.width };
         });
       }
     };
 
-    updatePosition();
-    window.addEventListener('resize', updatePosition);
-    window.addEventListener('scroll', updatePosition);
+    const observer = new ResizeObserver(updatePosition);
+    if (placeholderRef.current) observer.observe(placeholderRef.current);
+    window.addEventListener('resize', updatePosition, { passive: true });
 
     return () => {
+      observer.disconnect();
       window.removeEventListener('resize', updatePosition);
-      window.removeEventListener('scroll', updatePosition);
     };
   }, []);
 
   const displayName = user.nickname || user.name;
   const tweetCount = user.stats?.tweets || 0;
-  const followingCount = user.stats?.following || 0;
-  const followersCount = user.stats?.followers || 0;
   return (
     <>
 
@@ -85,6 +84,7 @@ export default function TwitterHeader({ user, slug }: TwitterHeaderProps) {
             <div className="absolute -bottom-12 left-4">
                 <img 
                   src={user.avatar} 
+                  alt={displayName}
                   className="w-24 h-24 rounded-full border-4 border-white dark:border-[#16181c] object-cover bg-white dark:bg-black" 
                 />
             </div>

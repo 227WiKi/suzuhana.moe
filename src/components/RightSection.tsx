@@ -3,9 +3,10 @@
 import { usePathname } from "next/navigation";
 import Timeline from "./Timeline";
 import CalendarWidget from "./CalendarWidget";
+import type { TimelineEvent } from "@/lib/api";
 
 interface RightSectionProps {
-  events: any[];
+  events: TimelineEvent[];
   slug: string;
   dateRange: { start: string, end: string } | null;
 }
@@ -33,6 +34,7 @@ export default function RightSection({ events, slug, dateRange }: RightSectionPr
         null
       ) : (
         <CalendarWidget 
+          key={`${dateRange?.start}-${dateRange?.end}`}
           minDate={dateRange?.start} 
           maxDate={dateRange?.end} 
         />

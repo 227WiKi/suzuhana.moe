@@ -52,7 +52,7 @@ export default async function GlobalLandingPage() {
             </div>
             
             <h1 className="text-5xl sm:text-7xl font-black mb-8 leading-[1.1] tracking-tight">
-               What's Project<br/>
+               What&apos;s Project<br/>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF99CC] to-[#FFCCFF]">
                Suzuhana Moe?
               </span>

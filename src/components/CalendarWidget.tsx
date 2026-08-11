@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -18,12 +18,6 @@ export default function CalendarWidget({ minDate, maxDate }: CalendarWidgetProps
   const [currentDate, setCurrentDate] = useState(() => {
     return maxDate ? new Date(maxDate) : new Date();
   });
-
-  useEffect(() => {
-    if (maxDate) {
-      setCurrentDate(new Date(maxDate));
-    }
-  }, [maxDate]);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();

@@ -1,4 +1,4 @@
-import { getUserData, getTweets } from '@/lib/api'; 
+import { getMediaPage, getUserData } from '@/lib/api';
 import { notFound } from 'next/navigation';
 import MediaGrid from '@/components/MediaGrid';
 
@@ -9,18 +9,18 @@ interface PageProps {
 export default async function MediaPage({ params }: PageProps) {
   const { slug } = await params;
 
-  const user = await getUserData(slug, 'twitter');
+  const [user, page] = await Promise.all([
+    getUserData(slug, 'twitter'),
+    getMediaPage(slug),
+  ]);
   if (!user) return notFound();
-
-
-  const tweetsData = await getTweets(slug);
-  const tweets = Array.isArray(tweetsData) ? tweetsData : [];
-
-  const uniqueTweets = Array.from(new Map(tweets.map(item => [item.id, item])).values());
   
   return (
     <MediaGrid 
-      tweets={uniqueTweets} 
+      initialItems={page.items}
+      total={page.total}
+      nextOffset={page.nextOffset}
+      slug={slug}
       user={user} 
     />
   );

@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { Media } from "@/lib/api";
+import { useState } from "react";
+import type { Media } from "@/lib/api";
 import { AlertCircle, Play } from "lucide-react";
-import "glightbox/dist/css/glightbox.min.css";
+import { useLightbox } from "./LightboxProvider";
 
 function GalleryItem({ 
   media, 
@@ -66,50 +66,7 @@ function GalleryItem({
 }
 
 export default function ImageGallery({ media }: { media: Media[] }) {
-  const lightboxRef = useRef<any>(null);
-
-  const lightboxElements = media.map(m => ({
-    href: m.url,
-    type: m.type === 'video' ? 'video' : 'image',
-    width: m.type === 'video' ? '90vw' : undefined, 
-    source: m.type === 'video' ? 'local' : undefined,
-  }));
-
-  useEffect(() => {
-    let instance: any = null;
-    const initLightbox = async () => {
-      const module = await import("glightbox");
-      const GLightbox = module.default;
-      instance = GLightbox({
-        elements: lightboxElements as any,
-        touchNavigation: true,
-        loop: false,
-        zoomable: true,
-        draggable: true,
-        openEffect: 'zoom', 
-        closeEffect: 'zoom',
-        autoplayVideos: true,
-        plyr: {
-          config: {
-            ratio: null as any, 
-            fullscreen: { enabled: true, iosNative: true },
-          }
-        },
-        width: 'auto',
-        height: 'auto',
-      });
-      lightboxRef.current = instance;
-    };
-
-    if (lightboxElements.length > 0) initLightbox();
-    return () => { if (instance) instance.destroy(); };
-  }, [media]);
-
-  const handleOpenLightbox = (url: string) => {
-    if (!lightboxRef.current) return;
-    const index = lightboxElements.findIndex(item => item.href === url);
-    if (index >= 0) lightboxRef.current.openAt(index);
-  };
+  const lightbox = useLightbox();
 
   if (!media || media.length === 0) return null;
 
@@ -123,7 +80,10 @@ export default function ImageGallery({ media }: { media: Media[] }) {
   })();
 
   return (
-    <div className={`grid gap-0.5 rounded-xl overflow-hidden mt-3 border border-gray-200 dark:border-gray-800 ${gridClassName}`}>
+    <div
+      className={`grid gap-0.5 rounded-xl overflow-hidden mt-3 border border-gray-200 dark:border-gray-800 ${gridClassName}`}
+      onPointerEnter={lightbox.preload}
+    >
       {media.map((m, index) => {
         const isThreeLayout = media.length === 3;
         const spanClass = isThreeLayout && index === 0 ? "row-span-2" : "";
@@ -132,7 +92,7 @@ export default function ImageGallery({ media }: { media: Media[] }) {
           <div key={m.url + index} className={`relative bg-gray-100 dark:bg-gray-900 overflow-hidden ${spanClass}`}>
             <GalleryItem 
               media={m} 
-              onClick={() => handleOpenLightbox(m.url)}
+              onClick={() => void lightbox.open(media, index)}
             />
           </div>
         );
