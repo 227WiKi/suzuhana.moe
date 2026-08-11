@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Layers, X, ChevronLeft, ChevronRight, Loader2, Play, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import RichText from "@/components/RichText";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 
 interface InstagramPost {
   id: string;
@@ -38,9 +39,11 @@ function GridItem({ post, onClick }: { post: InstagramPost; onClick: () => void 
   }
 
   return (
-    <motion.div 
+    <motion.button
+      type="button"
       whileTap={{ scale: 0.97 }}
       onClick={onClick}
+      aria-label={`Open Instagram post from ${post.date}`}
       className="group relative aspect-square w-full overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-zinc-900 cursor-pointer"
     >
       <img
@@ -63,19 +66,15 @@ function GridItem({ post, onClick }: { post: InstagramPost; onClick: () => void 
           </div>
         )}
       </div>
-    </motion.div>
+    </motion.button>
   );
 }
 
 export default function InstagramGrid({ posts, userData }: InstagramGridProps) {
   const [selectedPost, setSelectedPost] = useState<InstagramPost | null>(null);
   const [currentImgIndex, setCurrentImgIndex] = useState(0);
-  const [[page, direction], setPage] = useState([0, 0]);
+  const [[, direction], setPage] = useState([0, 0]);
   const [isImgLoading, setIsImgLoading] = useState(false);
-
-  useEffect(() => {
-    document.body.style.overflow = selectedPost ? "hidden" : "auto";
-  }, [selectedPost]);
 
   const openPost = (post: InstagramPost) => {
     setSelectedPost(post);
@@ -118,24 +117,21 @@ export default function InstagramGrid({ posts, userData }: InstagramGridProps) {
         ))}
       </div>
 
-      <AnimatePresence>
+      <Dialog open={selectedPost !== null} onOpenChange={(open) => { if (!open) setSelectedPost(null); }}>
         {selectedPost && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-white/60 dark:bg-black/80 backdrop-blur-sm p-4 md:p-10"
-            onClick={() => setSelectedPost(null)}
+          <DialogContent
+            showCloseButton={false}
+            overlayClassName="bg-white/60 dark:bg-black/80 backdrop-blur-sm"
+            className="w-fit max-w-[95vw] md:max-w-[90vw] max-h-[90vh] p-0 gap-0 bg-transparent dark:bg-transparent ring-0 rounded-2xl"
           >
+            <DialogTitle className="sr-only">Instagram post from {selectedPost.date}</DialogTitle>
             <div className="hidden" aria-hidden="true">
-              {selectedPost.images.map((img, i) => <img key={i} src={img} />)}
+              {selectedPost.images.map((img, i) => <img key={i} src={img} alt="" />)}
             </div>
 
             <motion.div
               initial={{ scale: 0.98, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.98, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
               className="flex flex-col md:flex-row w-fit max-w-[95vw] md:max-w-[90vw] max-h-[90vh] bg-white dark:bg-zinc-950 rounded-2xl overflow-hidden shadow-2xl border border-gray-200 dark:border-gray-800"
             >
               <div className="relative bg-gray-50 dark:bg-zinc-900 flex items-center justify-center overflow-hidden min-h-[300px] md:min-h-0">
@@ -175,12 +171,14 @@ export default function InstagramGrid({ posts, userData }: InstagramGridProps) {
                   <div className="absolute inset-0 flex items-center justify-between px-4 z-30 pointer-events-none">
                     <button
                       onClick={(e) => { e.stopPropagation(); paginate(-1); }}
+                      aria-label="Previous image"
                       className={`p-2 rounded-full bg-white/90 dark:bg-black/50 text-black dark:text-white backdrop-blur-sm shadow-md pointer-events-auto transition hover:scale-110 ${currentImgIndex === 0 ? 'opacity-0 cursor-default' : 'opacity-100'}`}
                     >
                       <ChevronLeft size={20} />
                     </button>
                     <button
                       onClick={(e) => { e.stopPropagation(); paginate(1); }}
+                      aria-label="Next image"
                       className={`p-2 rounded-full bg-white/90 dark:bg-black/50 text-black dark:text-white backdrop-blur-sm shadow-md pointer-events-auto transition hover:scale-110 ${currentImgIndex === selectedPost.images.length - 1 ? 'opacity-0 cursor-default' : 'opacity-100'}`}
                     >
                       <ChevronRight size={20} />
@@ -199,7 +197,7 @@ export default function InstagramGrid({ posts, userData }: InstagramGridProps) {
                       {userData.screen_name}
                     </span>
                   </div>
-                  <button onClick={() => setSelectedPost(null)} className="p-1 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md transition text-gray-400">
+                  <button onClick={() => setSelectedPost(null)} aria-label="Close Instagram post" className="p-1 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md transition text-gray-400">
                     <X size={18} />
                   </button>
                 </div>
@@ -240,9 +238,9 @@ export default function InstagramGrid({ posts, userData }: InstagramGridProps) {
                 )}
               </div>
             </motion.div>
-          </motion.div>
+          </DialogContent>
         )}
-      </AnimatePresence>
+      </Dialog>
 
       <style jsx global>{`
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }

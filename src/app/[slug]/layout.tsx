@@ -1,8 +1,7 @@
-import { getUsers, getUserData, getTimeline, getTweetDateRange } from "@/lib/api"; // 👈 修复：确保这一行存在
+import { getUsers, getUserData, getTimeline, getTweetDateRange } from "@/lib/api";
 import { notFound } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
 import RightSection from '@/components/RightSection';
-import FloatingActions from '@/components/FloatingActions';
 import SectionTransition from '@/components/SectionTransition'; 
 import ProfileEntry from '@/components/ProfileEntry';
 import MobileNav from '@/components/MobileNav';
@@ -15,10 +14,12 @@ interface LayoutProps {
 export default async function MemberLayout({ children, params }: LayoutProps) {
   const { slug } = await params;
   
-  const timelineEvents = await getTimeline(slug);
-  const dateRange = await getTweetDateRange(slug);  
-  const data = await getUserData(slug, 'twitter');
-  const allUsers = await getUsers();
+  const [timelineEvents, dateRange, data, allUsers] = await Promise.all([
+    getTimeline(slug),
+    getTweetDateRange(slug),
+    getUserData(slug, 'twitter'),
+    getUsers(),
+  ]);
 
   if (!data) return notFound();
   const user = data; 
@@ -26,7 +27,7 @@ export default async function MemberLayout({ children, params }: LayoutProps) {
   return (
     <div 
       className="min-h-screen bg-[#F9FAFB] dark:bg-black text-gray-900 dark:text-white transition-colors duration-300" 
-      style={{ scrollbarGutter: 'stable' }} // 👈 核心：防止滚动条出现引起的布局抖动
+      style={{ scrollbarGutter: 'stable' }}
     >
       
       <MobileNav slug={slug} user={user} allUsers={allUsers} />
@@ -55,8 +56,6 @@ export default async function MemberLayout({ children, params }: LayoutProps) {
           />          
         </div>
       </ProfileEntry>
-      
-      <FloatingActions />
     </div>
   );
 }

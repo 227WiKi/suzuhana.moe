@@ -1,22 +1,29 @@
-import { getUserData, getTweets } from '@/lib/api';
+import { getTweetPage, getUserData } from '@/lib/api';
 import { notFound } from 'next/navigation';
 import TweetList from '@/components/TweetList';
 
 interface PageProps {
   params: Promise<{ slug: string }>; 
+  searchParams: Promise<{ date?: string }>;
 }
 
-export default async function TweetsPage({ params }: PageProps) {
-  const { slug } = await params;
+export default async function TweetsPage({ params, searchParams }: PageProps) {
+  const [{ slug }, { date = "" }] = await Promise.all([params, searchParams]);
 
-  const user = await getUserData(slug, 'twitter');
+  const [user, page] = await Promise.all([
+    getUserData(slug, 'twitter'),
+    getTweetPage(slug, 0, 20, date),
+  ]);
   if (!user) return notFound();
-
-  const tweets = await getTweets(slug);
   
   return (
     <TweetList 
-      initialTweets={tweets} 
+      key={date || "latest"}
+      initialTweets={page.items}
+      total={page.total}
+      nextOffset={page.nextOffset}
+      targetTweetId={page.targetId}
+      slug={slug}
       user={user} 
     />
   );

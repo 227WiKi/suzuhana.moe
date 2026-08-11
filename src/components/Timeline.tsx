@@ -1,4 +1,4 @@
-import { TimelineEvent } from "@/lib/api";
+import type { TimelineEvent } from "@/lib/api";
 import { Star, Disc, Flag, Circle, AtSign } from "lucide-react";
 
 const getIcon = (type: string | undefined) => {

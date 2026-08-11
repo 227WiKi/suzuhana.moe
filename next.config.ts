@@ -4,12 +4,12 @@ import { execSync } from 'child_process';
 let commitHash = 'dev';
 try {
   commitHash = execSync('git rev-parse --short HEAD').toString().trim();
-} catch (e) {
+} catch {
   console.warn('Could not get git commit hash, falling back to "dev"');
 }
 
 
-const nextConfig = {
+const nextConfig: NextConfig = {
   env: {
     NEXT_PUBLIC_COMMIT_SHA: commitHash,
   },
@@ -17,8 +17,8 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'files.227wiki.eu.org', 
-        pathname: '/d/Backup/**',        
+        hostname: 'res.227wiki.eu.org',
+        pathname: '/archive/**',
       },
       {
         protocol: 'https',
