@@ -51,6 +51,7 @@ export default function TwitterHeader({ user, slug }: TwitterHeaderProps) {
 
 
       <div 
+        data-archive-sticky-header
         className={`
           hidden sm:block 
           fixed top-3 z-30 

@@ -98,6 +98,30 @@
   max-width: none;
 }
 
+.archive-calendar .rdp-month_grid {
+  display: table;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.archive-calendar .rdp-month_grid thead {
+  display: table-header-group;
+}
+
+.archive-calendar .rdp-month_grid tbody {
+  display: table-row-group;
+}
+
+.archive-calendar .rdp-month_grid tr {
+  display: table-row;
+}
+
+.archive-calendar .rdp-month_grid th,
+.archive-calendar .rdp-month_grid td {
+  display: table-cell;
+  width: calc(100% / 7);
+}
+
 .archive-calendar .rdp-month_caption {
   padding-left: 24px;
   font-size: 0.875rem;

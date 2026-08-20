@@ -72,14 +72,52 @@ export default function TweetList({
 
   useEffect(() => {
     if (!targetTweetId) return;
+    let cancelledByUser = false;
+    const correctionTimers: number[] = [];
+    const cancelEvents = ["wheel", "touchstart", "pointerdown", "keydown"] as const;
+    const cancelCorrections = () => {
+      cancelledByUser = true;
+    };
+    cancelEvents.forEach((eventName) => {
+      window.addEventListener(eventName, cancelCorrections, { passive: true });
+    });
+
+    const alignTarget = (behavior: ScrollBehavior) => {
+      if (cancelledByUser) return;
+      const element = document.getElementById(`tweet-${targetTweetId}`);
+      if (!element) return;
+      const stickyHeaderBottom = Array.from(
+        document.querySelectorAll<HTMLElement>("[data-archive-sticky-header]"),
+      ).reduce((bottom, header) => (
+        getComputedStyle(header).display === "none"
+          ? bottom
+          : Math.max(bottom, header.getBoundingClientRect().bottom)
+      ), 0);
+      const offset = Math.max(stickyHeaderBottom + 12, 16);
+      const delta = element.getBoundingClientRect().top - offset;
+      if (Math.abs(delta) > 2) {
+        window.scrollBy({ top: delta, behavior });
+      }
+    };
+
     const frame = requestAnimationFrame(() => {
       const element = document.getElementById(`tweet-${targetTweetId}`);
       if (!element) return;
-      element.scrollIntoView({ behavior: "smooth", block: "center" });
+      alignTarget("smooth");
       element.classList.add("highlight-pulse");
-      window.setTimeout(() => element.classList.remove("highlight-pulse"), 2000);
+      correctionTimers.push(
+        window.setTimeout(() => alignTarget("auto"), 700),
+        window.setTimeout(() => alignTarget("auto"), 1400),
+        window.setTimeout(() => element.classList.remove("highlight-pulse"), 2000),
+      );
     });
-    return () => cancelAnimationFrame(frame);
+    return () => {
+      cancelAnimationFrame(frame);
+      correctionTimers.forEach(window.clearTimeout);
+      cancelEvents.forEach((eventName) => {
+        window.removeEventListener(eventName, cancelCorrections);
+      });
+    };
   }, [targetTweetId]);
 
   return (

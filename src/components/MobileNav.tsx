@@ -18,7 +18,10 @@ export default function MobileNav({ slug, user, allUsers }: MobileNavProps) {
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
-      <div className="lg:hidden sticky top-0 z-40 w-full bg-white/80 dark:bg-[#16181c]/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 px-4 h-14 flex items-center justify-between">
+      <div
+        data-archive-sticky-header
+        className="lg:hidden sticky top-0 z-40 w-full bg-white/80 dark:bg-[#16181c]/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 px-4 h-14 flex items-center justify-between"
+      >
         <SheetTrigger asChild>
           <button className="relative group" aria-label="Open navigation">
             <img

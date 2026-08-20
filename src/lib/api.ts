@@ -286,7 +286,9 @@ const getTweetPageCached = cache(async (
 ): Promise<ArchivePage<Tweet>> => {
   const tweets = await getTweets(slug);
   const limit = Math.min(Math.max(requestedLimit, 1), 5000);
-  let end = Math.min(offset + limit, tweets.length);
+  let start = Math.min(offset, tweets.length);
+  let end = Math.min(start + limit, tweets.length);
+  let total = tweets.length;
   let targetId: string | undefined;
 
   if (offset === 0 && targetDate) {
@@ -294,13 +296,15 @@ const getTweetPageCached = cache(async (
     const targetIndex = tweets.findIndex((tweet) => tweet.date.substring(0, 10) <= normalizedDate);
     if (targetIndex >= 0) {
       targetId = tweets[targetIndex].id;
-      end = Math.min(tweets.length, (Math.ceil((targetIndex + 1) / limit) + 1) * limit);
+      start = targetIndex;
+      end = Math.min(start + limit, tweets.length);
+      total = tweets.length - start;
     }
   }
 
   return {
-    items: tweets.slice(offset, end),
-    total: tweets.length,
+    items: tweets.slice(start, end),
+    total,
     nextOffset: end < tweets.length ? end : null,
     targetId,
   };
