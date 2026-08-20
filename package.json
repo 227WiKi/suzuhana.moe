@@ -13,7 +13,9 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@daypicker/react": "^10.0.1",
     "@opennextjs/cloudflare": "^1.16.1",
+    "@radix-ui/react-select": "^2.3.7",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",

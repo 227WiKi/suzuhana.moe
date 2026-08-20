@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type SyntheticEvent } from "react";
 import { Layers, X, ChevronLeft, ChevronRight, Loader2, Play, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import RichText from "@/components/RichText";
@@ -23,6 +23,11 @@ interface UserData {
 interface InstagramGridProps {
   posts: InstagramPost[];
   userData: UserData;
+}
+
+interface ImageFrameSize {
+  width: number;
+  height: number;
 }
 
 function GridItem({ post, onClick }: { post: InstagramPost; onClick: () => void }) {
@@ -75,12 +80,30 @@ export default function InstagramGrid({ posts, userData }: InstagramGridProps) {
   const [currentImgIndex, setCurrentImgIndex] = useState(0);
   const [[, direction], setPage] = useState([0, 0]);
   const [isImgLoading, setIsImgLoading] = useState(false);
+  const [imageFrameSize, setImageFrameSize] = useState<ImageFrameSize | null>(null);
 
   const openPost = (post: InstagramPost) => {
     setSelectedPost(post);
     setCurrentImgIndex(0);
     setPage([0, 0]);
-    setIsImgLoading(false); 
+    setIsImgLoading(false);
+    setImageFrameSize(null);
+  };
+
+  const handleImageLoad = (event: SyntheticEvent<HTMLImageElement>) => {
+    const image = event.currentTarget;
+    const nextSize = {
+      width: Math.round(image.offsetWidth),
+      height: Math.round(image.offsetHeight),
+    };
+    if (nextSize.width > 0 && nextSize.height > 0) {
+      setImageFrameSize((current) => (
+        current?.width === nextSize.width && current.height === nextSize.height
+          ? current
+          : nextSize
+      ));
+    }
+    setIsImgLoading(false);
   };
 
   const paginate = (newDirection: number) => {
@@ -125,16 +148,16 @@ export default function InstagramGrid({ posts, userData }: InstagramGridProps) {
             className="w-fit max-w-[95vw] md:max-w-[90vw] max-h-[90vh] p-0 gap-0 bg-transparent dark:bg-transparent ring-0 rounded-2xl"
           >
             <DialogTitle className="sr-only">Instagram post from {selectedPost.date}</DialogTitle>
-            <div className="hidden" aria-hidden="true">
-              {selectedPost.images.map((img, i) => <img key={i} src={img} alt="" />)}
-            </div>
 
             <motion.div
               initial={{ scale: 0.98, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               className="flex flex-col md:flex-row w-fit max-w-[95vw] md:max-w-[90vw] max-h-[90vh] bg-white dark:bg-zinc-950 rounded-2xl overflow-hidden shadow-2xl border border-gray-200 dark:border-gray-800"
             >
-              <div className="relative bg-gray-50 dark:bg-zinc-900 flex items-center justify-center overflow-hidden min-h-[300px] md:min-h-0">
+              <div
+                className="relative flex min-h-[300px] w-[min(90vw,560px)] shrink-0 items-center justify-center overflow-hidden bg-gray-50 transition-[width,height] duration-200 dark:bg-zinc-900 md:min-h-[420px] md:min-w-[480px] md:w-auto"
+                style={imageFrameSize ?? undefined}
+              >
                 
                 <AnimatePresence>
                   {isImgLoading && (
@@ -162,8 +185,8 @@ export default function InstagramGrid({ posts, userData }: InstagramGridProps) {
                       x: { type: "spring", stiffness: 300, damping: 32 },
                       opacity: { duration: 0.25 }
                     }}
-                    onLoad={() => setIsImgLoading(false)}
-                    className="max-h-[70vh] md:max-h-[90vh] w-auto object-contain block relative"
+                    onLoad={handleImageLoad}
+                    className="relative block h-auto w-auto max-h-[70vh] max-w-full object-contain md:max-h-[90vh]"
                   />
                 </AnimatePresence>
 

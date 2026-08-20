@@ -24,6 +24,8 @@ function MediaItem({ media, likes, onClick, onPreload }: {
   onPreload: () => void;
 }) {
   const [isError, setIsError] = useState(false);
+  const previewUrl = media.thumbnail_url || media.url;
+  const hasVideoPoster = media.type === "video" && previewUrl !== media.url;
   if (isError) {
     return (
       <div className="w-full aspect-square bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex flex-col items-center justify-center text-gray-400 p-2 rounded-xl mb-3">
@@ -39,7 +41,7 @@ function MediaItem({ media, likes, onClick, onPreload }: {
       onPointerEnter={onPreload}
       className="block w-full text-left relative group bg-gray-100 dark:bg-gray-900 rounded-xl overflow-hidden cursor-pointer border border-transparent dark:border-gray-800 mb-3 shadow-sm hover:shadow-md transition-shadow"
     >
-      {media.type === "video" ? (
+      {media.type === "video" && !hasVideoPoster ? (
         <div className="w-full relative">
           <video src={media.url} className="w-full h-auto object-cover pointer-events-none" preload="metadata" muted onError={() => setIsError(true)} />
           <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-black/30 transition">
@@ -50,8 +52,9 @@ function MediaItem({ media, likes, onClick, onPreload }: {
         </div>
       ) : (
         <img
-          src={media.thumbnail_url || media.url}
+          src={previewUrl}
           loading="lazy"
+          decoding="async"
           onError={() => setIsError(true)}
           className="w-full h-auto object-cover hover:opacity-90 transition duration-500"
           alt="media"
@@ -155,6 +158,7 @@ export default function MediaGrid({ initialItems, total, nextOffset: initialNext
         ? { href: item.media.url, type: "video", source: [{ src: item.media.url, type: "video/mp4" }], width: "80vw" }
         : { href: item.media.url, type: "image" }),
       touchNavigation: true,
+      preload: false,
       loop: false,
       zoomable: true,
       draggable: true,

@@ -102,6 +102,12 @@ export interface ArchivePage<T> {
   targetId?: string;
 }
 
+export interface TweetCalendarData {
+  start: string;
+  end: string;
+  availableDates: string[];
+}
+
 interface PlatformUser {
   name?: string;
   avatar?: string;
@@ -367,9 +373,21 @@ export const getTimeline = cache(async (slug: string): Promise<TimelineEvent[]> 
   return [];
 });
 
-export const getTweetDateRange = cache(async (slug: string): Promise<{ start: string; end: string } | null> => {
-  const meta = await loadArchiveMeta(slug, "twitter");
-  return meta?.start && meta.end ? { start: meta.start, end: meta.end } : null;
+export const getTweetCalendarData = cache(async (slug: string): Promise<TweetCalendarData | null> => {
+  const tweets = await getTweets(slug);
+  const availableDates = Array.from(new Set(
+    tweets
+      .map((tweet) => tweet.date.substring(0, 10))
+      .filter((date) => /^\d{4}-\d{2}-\d{2}$/.test(date)),
+  )).sort();
+
+  if (availableDates.length === 0) return null;
+
+  return {
+    start: availableDates[0],
+    end: availableDates[availableDates.length - 1],
+    availableDates,
+  };
 });
 
 export const getInstagramPosts = cache(async (slug: string): Promise<InstagramPost[]> => {

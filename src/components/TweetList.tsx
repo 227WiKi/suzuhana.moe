@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
 import type { ArchivePage, ArchiveUser, Tweet } from "@/lib/api";
+import { ARCHIVE_SCROLL_TO_TOP_EVENT } from "@/lib/ui-events";
 import TweetCard from "./TweetCard";
 
 const BATCH_SIZE = 20;
@@ -59,6 +60,15 @@ export default function TweetList({
     observer.observe(sentinel);
     return () => observer.disconnect();
   }, [loadMore, nextOffset]);
+
+  useEffect(() => {
+    const handleScrollToTop = (event: Event) => {
+      event.preventDefault();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+    window.addEventListener(ARCHIVE_SCROLL_TO_TOP_EVENT, handleScrollToTop);
+    return () => window.removeEventListener(ARCHIVE_SCROLL_TO_TOP_EVENT, handleScrollToTop);
+  }, []);
 
   useEffect(() => {
     if (!targetTweetId) return;

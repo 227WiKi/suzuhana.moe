@@ -3,19 +3,19 @@
 import { usePathname } from "next/navigation";
 import Timeline from "./Timeline";
 import CalendarWidget from "./CalendarWidget";
-import type { TimelineEvent } from "@/lib/api";
+import type { TimelineEvent, TweetCalendarData } from "@/lib/api";
 
 interface RightSectionProps {
   events: TimelineEvent[];
   slug: string;
-  dateRange: { start: string, end: string } | null;
+  calendarData: TweetCalendarData | null;
 }
 
-export default function RightSection({ events, slug, dateRange }: RightSectionProps) {
+export default function RightSection({ events, slug, calendarData }: RightSectionProps) {
   const pathname = usePathname();
   
   const isProfilePage = pathname === `/${slug}` || pathname === `/${slug}/`;
-  const isInstagramPage = pathname.includes(`/${slug}/instagram`);
+  const isTweetsPage = pathname === `/${slug}/tweets` || pathname === `/${slug}/tweets/`;
 
   return (
     <div 
@@ -30,15 +30,14 @@ export default function RightSection({ events, slug, dateRange }: RightSectionPr
       
       {isProfilePage ? (
         <Timeline events={events} />
-      ) : isInstagramPage ? (
-        null
-      ) : (
+      ) : isTweetsPage ? (
         <CalendarWidget 
-          key={`${dateRange?.start}-${dateRange?.end}`}
-          minDate={dateRange?.start} 
-          maxDate={dateRange?.end} 
+          key={`${calendarData?.start}-${calendarData?.end}`}
+          minDate={calendarData?.start}
+          maxDate={calendarData?.end}
+          availableDates={calendarData?.availableDates}
         />
-      )}
+      ) : null}
 
       <div className="bg-gray-50 dark:bg-[#16181c] border border-gray-200 dark:border-none rounded-xl p-4 transition-colors">
         <h2 className="text-xl font-bold mb-4 text-black dark:text-white">About</h2>

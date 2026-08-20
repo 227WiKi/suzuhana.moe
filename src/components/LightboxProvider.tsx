@@ -37,6 +37,7 @@ export function LightboxProvider({ children }: { children: React.ReactNode }) {
         source: item.type === "video" ? "local" : undefined,
       })),
       touchNavigation: true,
+      preload: false,
       loop: false,
       zoomable: true,
       draggable: true,

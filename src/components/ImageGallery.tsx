@@ -16,6 +16,8 @@ function GalleryItem({
 }) {
   const [isError, setIsError] = useState(false);
   const isVideo = media.type === 'video';
+  const previewUrl = media.thumbnail_url || media.url;
+  const hasVideoPoster = isVideo && previewUrl !== media.url;
 
   if (isError) {
     return (
@@ -31,7 +33,7 @@ function GalleryItem({
       onClick={onClick}
       className={`w-full h-full relative group cursor-pointer ${className}`}
     >
-      {isVideo ? (
+      {isVideo && !hasVideoPoster ? (
         <video 
           src={media.url} 
           className="w-full h-full object-cover" 
@@ -42,9 +44,10 @@ function GalleryItem({
         />
       ) : (
         <img
-          src={media.url}
+          src={previewUrl}
           alt="Media"
           loading="lazy"
+          decoding="async"
           onError={() => setIsError(true)}
           className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
         />

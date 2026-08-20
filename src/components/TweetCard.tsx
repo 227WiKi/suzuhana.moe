@@ -46,7 +46,9 @@ export default function TweetCard({ tweet, user, hideMedia = false }: TweetCardP
   const isQuote = tweet.is_rt && tweet.rt_info?.type === 'quote';
 
   const displayUser = isRetweet && tweet.rt_info ? tweet.rt_info : user;
-  const displayName = "nickname" in displayUser ? displayUser.nickname : displayUser.name;
+  const displayName = "nickname" in displayUser && displayUser.nickname
+    ? displayUser.nickname
+    : displayUser.name;
 
   return (
     <article 

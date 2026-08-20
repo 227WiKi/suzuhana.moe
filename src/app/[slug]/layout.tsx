@@ -1,4 +1,4 @@
-import { getUsers, getUserData, getTimeline, getTweetDateRange } from "@/lib/api";
+import { getUsers, getUserData, getTimeline, getTweetCalendarData } from "@/lib/api";
 import { notFound } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
 import RightSection from '@/components/RightSection';
@@ -14,9 +14,9 @@ interface LayoutProps {
 export default async function MemberLayout({ children, params }: LayoutProps) {
   const { slug } = await params;
   
-  const [timelineEvents, dateRange, data, allUsers] = await Promise.all([
+  const [timelineEvents, calendarData, data, allUsers] = await Promise.all([
     getTimeline(slug),
-    getTweetDateRange(slug),
+    getTweetCalendarData(slug),
     getUserData(slug, 'twitter'),
     getUsers(),
   ]);
@@ -52,7 +52,7 @@ export default async function MemberLayout({ children, params }: LayoutProps) {
           <RightSection 
             events={timelineEvents} 
             slug={slug} 
-            dateRange={dateRange}
+            calendarData={calendarData}
           />          
         </div>
       </ProfileEntry>

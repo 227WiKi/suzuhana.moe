@@ -3,6 +3,7 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { useTheme } from "next-themes";
 import { ArrowUp, Moon, Sun } from "lucide-react";
+import { ARCHIVE_SCROLL_TO_TOP_EVENT } from "@/lib/ui-events";
 
 const subscribeToHydration = () => () => undefined;
 
@@ -14,9 +15,18 @@ export default function FloatingActions() {
 
   useEffect(() => {
     const handleScroll = () => setShowTopBtn(window.scrollY > 300);
+    handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const scrollToTop = () => {
+    const event = new Event(ARCHIVE_SCROLL_TO_TOP_EVENT, { cancelable: true });
+    const shouldUseWindowFallback = window.dispatchEvent(event);
+    if (shouldUseWindowFallback) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
 
   if (!mounted) return null;
 
@@ -32,7 +42,7 @@ export default function FloatingActions() {
       </button>
 
       <button
-        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        onClick={scrollToTop}
         className={`p-3 rounded-full shadow-lg transition-all duration-300 bg-[#008CD2] text-white hover:bg-[#00A9CC] ${showTopBtn ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10 pointer-events-none"}`}
         title="Back to Top"
         aria-label="Back to top"
