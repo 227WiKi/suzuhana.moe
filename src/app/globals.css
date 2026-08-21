@@ -66,10 +66,6 @@
   }
 }
 
-:target {
-  animation: flash-highlight 1.5s ease-out forwards;
-}
-
 .highlight-pulse {
   animation: flash-highlight 1.5s ease-out forwards;
 }

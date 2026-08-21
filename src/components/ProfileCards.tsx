@@ -41,7 +41,7 @@ export function WikiBoxCard({ slug, name, className = "" }: { slug: string; name
   );
 }
 
-export function ProfileInfoCard({ profile, twitterUser }: { profile: ProfileData; twitterUser: ArchiveUser }) {
+export function ProfileInfoCard({ profile, socialUser }: { profile: ProfileData; socialUser: ArchiveUser }) {
   const specs = [
     { label: "状态", value: profile.status, icon: GraduationCap },
     { label: "角色", value: profile.character, icon: Ghost },
@@ -62,7 +62,7 @@ export function ProfileInfoCard({ profile, twitterUser }: { profile: ProfileData
             {profile.name}
             <Sparkles className="animate-pulse opacity-80" size={32} style={{ color: profile.color, fill: profile.color }} />
           </h1>
-          <div className="flex items-center gap-3 text-gray-500 font-medium text-xl"><span>@{twitterUser.screen_name}</span></div>
+          <div className="flex items-center gap-3 text-gray-500 font-medium text-xl"><span>@{socialUser.screen_name}</span></div>
         </div>
         <div className="grid grid-cols-2 gap-y-8 gap-x-6 mb-8 p-1">
           {specs.map((spec) => (

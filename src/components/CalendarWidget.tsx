@@ -162,7 +162,7 @@ export default function CalendarWidget({
   if (availableDateSet.size === 0) return null;
 
   return (
-    <div className="archive-calendar-card relative mb-4 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-[#16181c]">
+    <div className="relative mb-4 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-[#16181c]">
       <CalendarIcon
         aria-hidden="true"
         size={16}

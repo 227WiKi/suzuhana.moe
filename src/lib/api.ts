@@ -1,6 +1,7 @@
 import "server-only";
 
 import { cache } from "react";
+import { archiveRegistry, type ArchiveJsonLoader } from "../generated/archive-registry";
 import { getAllMembers, getMemberBySlug } from "./members";
 
 export interface Media {
@@ -55,30 +56,33 @@ export interface ProfileData {
   };
 }
 
+export interface InstagramMediaItem {
+  type: "image" | "video";
+  url: string;
+  poster?: string;
+}
+
 export interface InstagramPost {
   id: string;
   date: string;
   text: string;
   images: string[];
-  type?: "photo" | "video";
+  media?: InstagramMediaItem[];
 }
 
 export interface ArchiveUser {
   slug: string;
   name: string;
   nickname: string;
-  platform: "twitter" | "instagram";
   avatar: string;
   banner: string | null;
   bio: string;
   screen_name: string;
   stats: {
     tweets: number;
-    posts: number;
     following: number;
     followers: number;
   };
-  raw: PlatformUser;
 }
 
 export interface ArchiveUserSummary {
@@ -131,8 +135,6 @@ interface PlatformUser {
 
 interface ArchiveMeta {
   count: number;
-  start?: string;
-  end?: string;
 }
 
 interface RawMediaEntity {
@@ -156,39 +158,32 @@ function moduleValue<T>(module: { default?: T } | T): T {
   return (module as { default?: T }).default ?? (module as T);
 }
 
+async function loadJson<T>(loader: ArchiveJsonLoader): Promise<T> {
+  return moduleValue<T>(await loader() as { default?: T } | T);
+}
+
 async function loadPlatformUser(slug: string, platform: "twitter" | "instagram") {
-  if (platform === "instagram") {
-    if (slug === "moe") return moduleValue<PlatformUser>(await import("../../data/moe/instagram/user.json"));
-    throw new Error(`Instagram user data is unavailable for ${slug}`);
-  }
-  if (slug === "moe") return moduleValue<PlatformUser>(await import("../../data/moe/twitter/user.json"));
-  if (slug === "oto") return moduleValue<PlatformUser>(await import("../../data/oto/twitter/user.json"));
-  throw new Error(`Twitter user data is unavailable for ${slug}`);
+  const loader = archiveRegistry[slug]?.[platform]?.user;
+  if (!loader) throw new Error(`${platform} user data is unavailable for ${slug}`);
+  return loadJson<PlatformUser>(loader);
 }
 
 async function loadArchiveMeta(slug: string, platform: "twitter" | "instagram") {
-  if (platform === "instagram") {
-    if (slug === "moe") return moduleValue<ArchiveMeta>(await import("../../data/moe/instagram/meta.json"));
-    return null;
-  }
-  if (slug === "moe") return moduleValue<ArchiveMeta>(await import("../../data/moe/twitter/meta.json"));
-  if (slug === "oto") return moduleValue<ArchiveMeta>(await import("../../data/oto/twitter/meta.json"));
-  return null;
+  const loader = archiveRegistry[slug]?.[platform]?.meta;
+  return loader ? loadJson<ArchiveMeta>(loader) : null;
 }
 
 async function loadRawTweets(slug: string): Promise<RawTweet[]> {
-  let value: unknown;
-  if (slug === "moe") value = moduleValue(await import("../../data/moe/twitter/tweets.json"));
-  else if (slug === "oto") value = moduleValue(await import("../../data/oto/twitter/tweets.json"));
-  else return [];
+  const loader = archiveRegistry[slug]?.twitter?.tweets;
+  if (!loader) return [];
+  const value = await loadJson<RawTweet[] | { tweets?: RawTweet[] }>(loader);
   if (Array.isArray(value)) return value as RawTweet[];
-  return (value as { tweets?: RawTweet[] }).tweets ?? [];
+  return value.tweets ?? [];
 }
 
 async function loadMediaMap(slug: string): Promise<Record<string, RawMediaMapItem>> {
-  if (slug === "moe") return moduleValue(await import("../../data/moe/twitter/media_map.json"));
-  if (slug === "oto") return moduleValue(await import("../../data/oto/twitter/media_map.json"));
-  return {};
+  const loader = archiveRegistry[slug]?.twitter?.media_map;
+  return loader ? loadJson<Record<string, RawMediaMapItem>>(loader) : {};
 }
 
 export const getUserData = cache(async (
@@ -219,18 +214,19 @@ export const getUserData = cache(async (
     slug: member.slug,
     name: member.name,
     nickname: platformUser.name || member.name,
-    platform,
     avatar: platformUser.avatar || platformUser.profile_image_url_https || platformUser.profile_pic_url || member.avatar,
     banner: platformUser.banner || platformUser.profile_banner_url || null,
     bio: platformUser.bio || platformUser.description || member.bio || "",
-    screen_name: platformUser.screen_name || member.accounts[platform] || member.accounts.twitter,
+    screen_name: platformUser.screen_name
+      || member.accounts[platform]
+      || member.accounts.twitter
+      || member.accounts.instagram
+      || member.slug,
     stats: {
       tweets: postCount,
-      posts: postCount,
       following: platformUser.stats?.following || 0,
       followers: platformUser.stats?.followers || 0,
     },
-    raw: platformUser,
   };
 });
 
@@ -342,41 +338,33 @@ export function getMediaPage(slug: string, offset = 0, limit = 15) {
 
 export const getProfile = cache(async (slug: string): Promise<ProfileData | null> => {
   try {
-    if (slug === "moe") return moduleValue(await import("../../data/moe/profile.json")) as ProfileData;
-    if (slug === "oto") return moduleValue(await import("../../data/oto/profile.json")) as ProfileData;
+    const loader = archiveRegistry[slug]?.profile;
+    return loader ? loadJson<ProfileData>(loader) : null;
   } catch {
     return null;
   }
-  return null;
 });
 
-export const getUsers = cache(async (): Promise<ArchiveUserSummary[]> => {
-  return Promise.all(getAllMembers().map(async (member) => {
-    let twitterData: PlatformUser = {};
-    try {
-      twitterData = await loadPlatformUser(member.slug, "twitter");
-    } catch {
-      // Member config remains a complete fallback.
-    }
-    return {
-      slug: member.slug,
-      name: member.name,
-      screen_name: member.accounts.twitter,
-      avatar: twitterData.avatar || twitterData.profile_image_url_https || member.avatar,
-      bio: member.bio || twitterData.bio || twitterData.description || "",
-      accounts: member.accounts,
-    };
-  }));
-});
+export const getUsers = cache((): ArchiveUserSummary[] => (
+  getAllMembers().map((member) => ({
+    slug: member.slug,
+    name: member.name,
+    screen_name: member.accounts.twitter
+      || member.accounts.instagram
+      || member.slug,
+    avatar: member.avatar,
+    bio: member.bio || "",
+    accounts: member.accounts,
+  }))
+));
 
 export const getTimeline = cache(async (slug: string): Promise<TimelineEvent[]> => {
   try {
-    if (slug === "moe") return moduleValue(await import("../../data/moe/timeline.json")) as TimelineEvent[];
-    if (slug === "oto") return moduleValue(await import("../../data/oto/timeline.json")) as TimelineEvent[];
+    const loader = archiveRegistry[slug]?.timeline;
+    return loader ? loadJson<TimelineEvent[]>(loader) : [];
   } catch {
     return [];
   }
-  return [];
 });
 
 export const getTweetCalendarData = cache(async (slug: string): Promise<TweetCalendarData | null> => {
@@ -398,10 +386,9 @@ export const getTweetCalendarData = cache(async (slug: string): Promise<TweetCal
 
 export const getInstagramPosts = cache(async (slug: string): Promise<InstagramPost[]> => {
   try {
-    if (slug !== "moe") return [];
-    const value = moduleValue<InstagramPost[] | { posts?: InstagramPost[] }>(
-      await import("../../data/moe/instagram/posts.json"),
-    );
+    const loader = archiveRegistry[slug]?.instagram?.posts;
+    if (!loader) return [];
+    const value = await loadJson<InstagramPost[] | { posts?: InstagramPost[] }>(loader);
     const posts = Array.isArray(value) ? value : value.posts ?? [];
     return [...posts].sort((a, b) => b.id.localeCompare(a.id));
   } catch {

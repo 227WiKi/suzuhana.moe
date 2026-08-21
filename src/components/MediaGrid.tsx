@@ -4,8 +4,8 @@ import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { AlertCircle, Heart, Info, Loader2, Play, X } from "lucide-react";
-import type GLightboxFactory from "glightbox";
 import type { ArchivePage, ArchiveUser, Media, MediaArchiveItem, Tweet } from "@/lib/api";
+import { loadGLightbox, preloadGLightbox, type LightboxInstance, type LightboxOptions } from "@/lib/glightbox";
 import TweetCard from "./TweetCard";
 import { Dialog, DialogContent, DialogTitle } from "./ui/dialog";
 import "glightbox/dist/css/glightbox.min.css";
@@ -20,8 +20,6 @@ const LIGHTBOX_SCROLL_KEYS = new Set([
   "PageUp",
   " ",
 ]);
-type LightboxInstance = ReturnType<typeof GLightboxFactory>;
-type LightboxModule = { default: typeof GLightboxFactory };
 interface LightboxWithSlideEvents {
   on(eventName: "slide_changed", callback: (data: { current: { index: number } }) => void): void;
 }
@@ -99,10 +97,8 @@ export default function MediaGrid({ initialItems, total, nextOffset: initialNext
   const [activeSlideTweet, setActiveSlideTweet] = useState<Tweet | null>(null);
   const [isCardOpen, setIsCardOpen] = useState(false);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
-  const [lightboxContainer, setLightboxContainer] = useState<HTMLElement | null>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const lightboxRef = useRef<LightboxInstance | null>(null);
-  const modulePromiseRef = useRef<Promise<LightboxModule> | null>(null);
   const numColumns = useSyncExternalStore(subscribeToViewport, () => window.innerWidth < 768 ? 2 : 3, () => 3);
 
   const columns = useMemo(() => {
@@ -112,7 +108,7 @@ export default function MediaGrid({ initialItems, total, nextOffset: initialNext
   }, [items, numColumns]);
 
   const preloadLightbox = useCallback(() => {
-    modulePromiseRef.current ??= import("glightbox") as Promise<LightboxModule>;
+    void preloadGLightbox();
   }, []);
 
   const loadMore = useCallback(async () => {
@@ -168,9 +164,8 @@ export default function MediaGrid({ initialItems, total, nextOffset: initialNext
   }, [isLightboxOpen]);
 
   const openLightbox = useCallback(async (clickedItem: MediaArchiveItem) => {
-    preloadLightbox();
-    const [module, response] = await Promise.all([
-      modulePromiseRef.current!,
+    const [GLightbox, response] = await Promise.all([
+      loadGLightbox(),
       items.length >= total
         ? Promise.resolve(null)
         : fetch(`/api/archive/${encodeURIComponent(slug)}/media?offset=0&limit=${total}`),
@@ -196,8 +191,8 @@ export default function MediaGrid({ initialItems, total, nextOffset: initialNext
       draggable: true,
       autoplayVideos: true,
       plyr: { config: {} },
-    } as unknown as Parameters<typeof module.default>[0];
-    const instance = module.default(lightboxOptions);
+    } as unknown as LightboxOptions;
+    const instance = GLightbox(lightboxOptions);
     (instance as unknown as LightboxWithSlideEvents).on("slide_changed", (data) => {
       const currentItem = archiveItems[data.current.index];
       if (currentItem) setActiveSlideTweet(currentItem.tweet);
@@ -206,16 +201,14 @@ export default function MediaGrid({ initialItems, total, nextOffset: initialNext
       setActiveSlideTweet(clickedItem.tweet);
       setIsCardOpen(false);
       setIsLightboxOpen(true);
-      setLightboxContainer(document.querySelector<HTMLElement>(".glightbox-container"));
     });
     instance.on("close", () => {
       setIsLightboxOpen(false);
       setIsCardOpen(false);
-      setLightboxContainer(null);
     });
     lightboxRef.current = instance;
     instance.openAt(Math.max(clickedIndex, 0));
-  }, [items, preloadLightbox, slug, total]);
+  }, [items, slug, total]);
 
   if (items.length === 0) return <div className="p-10 text-center text-gray-500">No media found.</div>;
 
@@ -243,10 +236,10 @@ export default function MediaGrid({ initialItems, total, nextOffset: initialNext
         </div>
       )}
 
-      {activeSlideTweet && lightboxContainer && createPortal(
+      {activeSlideTweet && isLightboxOpen && createPortal(
         <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 9_999_999 }}>
           <AnimatePresence>
-            {isLightboxOpen && !isCardOpen && (
+            {!isCardOpen && (
               <motion.button
                 key="view-btn"
                 onClick={(event) => { event.stopPropagation(); setIsCardOpen(true); }}

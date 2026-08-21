@@ -1,43 +1,21 @@
-"use client";
-
-import { usePathname } from "next/navigation";
-import Timeline from "./Timeline";
-import CalendarWidget from "./CalendarWidget";
-import type { TimelineEvent, TweetCalendarData } from "@/lib/api";
-
 interface RightSectionProps {
-  events: TimelineEvent[];
-  slug: string;
-  calendarData: TweetCalendarData | null;
+  children?: React.ReactNode;
+  profile?: boolean;
 }
 
-export default function RightSection({ events, slug, calendarData }: RightSectionProps) {
-  const pathname = usePathname();
-  
-  const isProfilePage = pathname === `/${slug}` || pathname === `/${slug}/`;
-  const isTweetsPage = pathname === `/${slug}/tweets` || pathname === `/${slug}/tweets/`;
-
+export default function RightSection({ children, profile = false }: RightSectionProps) {
   return (
     <div 
       className={`
         hidden lg:flex flex-col w-[350px] shrink-0 gap-4 h-fit
-        ${isProfilePage 
+        ${profile
           ? 'mt-4' 
           : 'sticky top-4' 
         }
       `}
     >
       
-      {isProfilePage ? (
-        <Timeline events={events} />
-      ) : isTweetsPage ? (
-        <CalendarWidget 
-          key={`${calendarData?.start}-${calendarData?.end}`}
-          minDate={calendarData?.start}
-          maxDate={calendarData?.end}
-          availableDates={calendarData?.availableDates}
-        />
-      ) : null}
+      {children}
 
       <div className="bg-gray-50 dark:bg-[#16181c] border border-gray-200 dark:border-none rounded-xl p-4 transition-colors">
         <h2 className="text-xl font-bold mb-4 text-black dark:text-white">About</h2>

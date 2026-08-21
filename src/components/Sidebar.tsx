@@ -3,8 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, User, Twitter, Instagram, MoreHorizontal } from "lucide-react";
-import type { ArchiveUser, ArchiveUserSummary } from "@/lib/api";
-import { MEMBERS } from "@/lib/members";
+import type { ArchiveUserSummary } from "@/lib/api";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,7 +14,7 @@ import {
 
 interface SidebarProps {
   username: string;
-  user: ArchiveUser;
+  user: ArchiveUserSummary;
   allUsers: ArchiveUserSummary[];
   className?: string;
   onNavigate?: () => void;
@@ -23,13 +22,16 @@ interface SidebarProps {
 
 export default function Sidebar({ username, user, allUsers, className = "", onNavigate }: SidebarProps) {
   const pathname = usePathname();
-  const configMember = MEMBERS.find((member) => member.slug === username || member.accounts.twitter === username);
+  const configMember = allUsers.find((member) => member.slug === username || member.accounts.twitter === username);
+  const hasTwitter = Boolean(configMember?.accounts?.twitter);
   const hasInstagram = Boolean(configMember?.accounts?.instagram);
   const navItems = [
     { name: "Home", path: "/", isActive: pathname === "/", icon: Home },
     { name: "Profile", path: `/${username}`, isActive: pathname === `/${username}` || pathname === `/${username}/`, icon: User },
-    { name: "Twitter", path: `/${username}/tweets`, isActive: pathname.includes(`/${username}/tweets`) || pathname.includes(`/${username}/media`), icon: Twitter },
   ];
+  if (hasTwitter) {
+    navItems.push({ name: "Twitter", path: `/${username}/tweets`, isActive: pathname.includes(`/${username}/tweets`) || pathname.includes(`/${username}/media`), icon: Twitter });
+  }
   if (hasInstagram) {
     navItems.push({ name: "Instagram", path: `/${username}/instagram`, isActive: pathname.includes(`/${username}/instagram`), icon: Instagram });
   }

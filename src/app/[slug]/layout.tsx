@@ -1,28 +1,23 @@
-import { getUsers, getUserData, getTimeline, getTweetCalendarData } from "@/lib/api";
+import { getUsers } from "@/lib/api";
 import { notFound } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
-import RightSection from '@/components/RightSection';
 import SectionTransition from '@/components/SectionTransition'; 
 import ProfileEntry from '@/components/ProfileEntry';
 import MobileNav from '@/components/MobileNav';
 
 interface LayoutProps {
   children: React.ReactNode;
+  right: React.ReactNode;
   params: Promise<{ slug: string }>;
 }
 
-export default async function MemberLayout({ children, params }: LayoutProps) {
+export default async function MemberLayout({ children, right, params }: LayoutProps) {
   const { slug } = await params;
   
-  const [timelineEvents, calendarData, data, allUsers] = await Promise.all([
-    getTimeline(slug),
-    getTweetCalendarData(slug),
-    getUserData(slug, 'twitter'),
-    getUsers(),
-  ]);
+  const allUsers = getUsers();
+  const user = allUsers.find((archiveUser) => archiveUser.slug === slug);
 
-  if (!data) return notFound();
-  const user = data; 
+  if (!user) return notFound();
 
   return (
     <div 
@@ -49,11 +44,7 @@ export default async function MemberLayout({ children, params }: LayoutProps) {
               </SectionTransition>
           </main>
 
-          <RightSection 
-            events={timelineEvents} 
-            slug={slug} 
-            calendarData={calendarData}
-          />          
+          {right}
         </div>
       </ProfileEntry>
     </div>

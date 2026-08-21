@@ -3,13 +3,13 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import Link from "next/link";
-import type { ArchiveUser, ArchiveUserSummary } from "@/lib/api";
+import type { ArchiveUserSummary } from "@/lib/api";
 import Sidebar from "./Sidebar";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "./ui/sheet";
 
 interface MobileNavProps {
   slug: string;
-  user: ArchiveUser;
+  user: ArchiveUserSummary;
   allUsers: ArchiveUserSummary[];
 }
 

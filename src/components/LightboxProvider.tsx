@@ -1,12 +1,9 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useRef } from "react";
-import type GLightboxFactory from "glightbox";
 import type { Media } from "@/lib/api";
+import { loadGLightbox, preloadGLightbox, type LightboxInstance, type LightboxOptions } from "@/lib/glightbox";
 import "glightbox/dist/css/glightbox.min.css";
-
-type LightboxInstance = ReturnType<typeof GLightboxFactory>;
-type LightboxModule = { default: typeof GLightboxFactory };
 
 interface LightboxContextValue {
   open: (media: Media[], index: number) => Promise<void>;
@@ -17,16 +14,14 @@ const LightboxContext = createContext<LightboxContextValue | null>(null);
 
 export function LightboxProvider({ children }: { children: React.ReactNode }) {
   const instanceRef = useRef<LightboxInstance | null>(null);
-  const modulePromiseRef = useRef<Promise<LightboxModule> | null>(null);
 
   const preload = useCallback(() => {
-    modulePromiseRef.current ??= import("glightbox") as Promise<LightboxModule>;
+    void preloadGLightbox();
   }, []);
 
   const open = useCallback(async (media: Media[], index: number) => {
     if (media.length === 0) return;
-    modulePromiseRef.current ??= import("glightbox") as Promise<LightboxModule>;
-    const { default: GLightbox } = await modulePromiseRef.current;
+    const GLightbox = await loadGLightbox();
 
     instanceRef.current?.destroy();
     const options = {
@@ -47,7 +42,7 @@ export function LightboxProvider({ children }: { children: React.ReactNode }) {
       plyr: { config: { fullscreen: { enabled: true, iosNative: true } } },
       width: "auto",
       height: "auto",
-    } as unknown as Parameters<typeof GLightbox>[0];
+    } as unknown as LightboxOptions;
     const instance = GLightbox(options);
     instanceRef.current = instance;
     instance.openAt(index);

@@ -1,7 +1,7 @@
 import { getUserData, getProfile } from '@/lib/api';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { MEMBERS } from '@/lib/members'; 
+import { getMemberBySlug } from '@/lib/members';
 import { ProfileImageCard, ProfileInfoCard, WikiBannerCard, WikiBoxCard } from '@/components/ProfileCards';
 import { 
   Twitter, 
@@ -12,17 +12,25 @@ import {
 
 export default async function ProfilePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  
-  const [twitterUser, profile] = await Promise.all([
-    getUserData(slug, 'twitter'),
+
+  const memberConfig = getMemberBySlug(slug);
+  if (!memberConfig) return notFound();
+  const profilePlatform = memberConfig.accounts.twitter ? 'twitter' : 'instagram';
+  const [socialUser, profile] = await Promise.all([
+    getUserData(slug, profilePlatform),
     getProfile(slug)
   ]);
 
-  if (!twitterUser || !profile) return notFound();
+  if (!socialUser || !profile) return notFound();
 
-  const memberConfig = MEMBERS.find(m => m.slug === slug);
-  const hasInstagram = Boolean(memberConfig?.accounts?.instagram);
-  const blogUrl = memberConfig?.accounts?.blog;
+  const hasTwitter = Boolean(memberConfig.accounts.twitter);
+  const hasInstagram = Boolean(memberConfig.accounts.instagram);
+  const blogUrl = memberConfig.accounts.blog;
+  const socialGridColumns = hasTwitter && hasInstagram
+    ? 'md:grid-cols-3'
+    : hasTwitter || hasInstagram
+      ? 'md:grid-cols-2'
+      : 'md:grid-cols-1';
 
   const isHorizontal = profile.assets.type === 'horizontal';
 
@@ -32,7 +40,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ slug: 
       <div className={`grid grid-cols-1 gap-6 flex-1 ${isHorizontal ? 'lg:grid-cols-2' : 'lg:grid-cols-12'}`}>
         
         <div className={`h-full ${isHorizontal ? '' : 'lg:col-span-7'}`}>
-           <ProfileInfoCard profile={profile} twitterUser={twitterUser} />
+           <ProfileInfoCard profile={profile} socialUser={socialUser} />
         </div>
 
         <div className={`flex flex-col gap-6 ${isHorizontal ? '' : 'lg:col-span-5 h-full'}`}>
@@ -56,21 +64,23 @@ export default async function ProfilePage({ params }: { params: Promise<{ slug: 
       )}
 
 
-      <div className={`grid grid-cols-1 ${hasInstagram ? 'md:grid-cols-3' : 'md:grid-cols-2'} gap-6`}>
-        <Link href={`/${slug}/tweets`} className="group bg-white dark:bg-[#16181c] p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 relative overflow-hidden flex flex-col justify-between h-48 sm:h-64">
-           <div className="absolute -top-4 -right-4 text-gray-100 dark:text-[#1d9bf0]/5 group-hover:scale-110 transition-transform">
-             <Twitter size={140} strokeWidth={1} />
-           </div>
-           <div className="relative z-10">
-             <div className="w-14 h-14 bg-[#1d9bf0]/10 rounded-2xl flex items-center justify-center text-[#1d9bf0] mb-6">
-               <Twitter size={28} />
-             </div>
-             <h3 className="text-2xl font-black text-gray-900 dark:text-white">Twitter</h3>
-           </div>
-           <div className="relative z-10 flex items-center font-bold text-[#1d9bf0]">
-             Visit <ArrowUpRight size={18} className="ml-2" />
-           </div>
-        </Link>
+      <div className={`grid grid-cols-1 ${socialGridColumns} gap-6`}>
+        {hasTwitter ? (
+          <Link href={`/${slug}/tweets`} className="group bg-white dark:bg-[#16181c] p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 relative overflow-hidden flex flex-col justify-between h-48 sm:h-64">
+            <div className="absolute -top-4 -right-4 text-gray-100 dark:text-[#1d9bf0]/5 group-hover:scale-110 transition-transform">
+              <Twitter size={140} strokeWidth={1} />
+            </div>
+            <div className="relative z-10">
+              <div className="w-14 h-14 bg-[#1d9bf0]/10 rounded-2xl flex items-center justify-center text-[#1d9bf0] mb-6">
+                <Twitter size={28} />
+              </div>
+              <h3 className="text-2xl font-black text-gray-900 dark:text-white">Twitter</h3>
+            </div>
+            <div className="relative z-10 flex items-center font-bold text-[#1d9bf0]">
+              Visit <ArrowUpRight size={18} className="ml-2" />
+            </div>
+          </Link>
+        ) : null}
 
         {hasInstagram && (
           <Link href={`/${slug}/instagram`} className="group bg-white dark:bg-[#16181c] p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 relative overflow-hidden flex flex-col justify-between h-48 sm:h-64">
