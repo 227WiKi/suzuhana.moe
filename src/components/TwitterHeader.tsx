@@ -2,7 +2,6 @@
 
 import RichText from '@/components/RichText';
 import ProfileTabs from '@/components/ProfileTabs';
-import { useRef, useState, useEffect } from 'react';
 import type { ArchiveUser } from '@/lib/api';
 
 interface TwitterHeaderProps {
@@ -11,59 +10,19 @@ interface TwitterHeaderProps {
 }
 
 export default function TwitterHeader({ user, slug }: TwitterHeaderProps) {
-  const placeholderRef = useRef<HTMLDivElement>(null);
-  const [headerStyle, setHeaderStyle] = useState<{ left: number; width: number } | null>(null);
-
-  useEffect(() => {
-    const updatePosition = () => {
-      if (placeholderRef.current) {
-        const rect = placeholderRef.current.getBoundingClientRect();
-        setHeaderStyle((current) => {
-          if (current?.left === rect.left && current.width === rect.width) return current;
-          return { left: rect.left, width: rect.width };
-        });
-      }
-    };
-
-    const observer = new ResizeObserver(updatePosition);
-    if (placeholderRef.current) observer.observe(placeholderRef.current);
-    window.addEventListener('resize', updatePosition, { passive: true });
-
-    return () => {
-      observer.disconnect();
-      window.removeEventListener('resize', updatePosition);
-    };
-  }, []);
-
   const displayName = user.nickname || user.name;
   const tweetCount = user.stats?.tweets || 0;
   return (
     <>
-
-      <div 
-        ref={placeholderRef} 
-        className="hidden sm:block mt-3 mb-4 px-4 py-3 border border-transparent opacity-0 pointer-events-none select-none"
-        aria-hidden="true"
-      >
-        <h1 className="text-xl font-bold leading-none">{displayName}</h1>
-        <p className="text-xs text-gray-500 mt-1">{tweetCount} posts</p>
-      </div>
-
-
       <div 
         data-archive-sticky-header
         className={`
           hidden sm:block 
-          fixed top-3 z-30 
+          sticky top-3 z-30 w-full mt-3 mb-4
           bg-white/90 dark:bg-[#16181c]/90 backdrop-blur-md 
           px-4 py-3 rounded-xl shadow-sm border border-white/20 
-          transition-opacity duration-150 pointer-events-none sm:pointer-events-auto
-          ${headerStyle ? 'opacity-100' : 'opacity-0'}
+          pointer-events-none sm:pointer-events-auto
         `}
-        style={{
-          left: headerStyle?.left,
-          width: headerStyle?.width,
-        }}
       >
         <div className="flex flex-col">
           <h1 className="text-xl font-bold leading-none truncate">{displayName}</h1>

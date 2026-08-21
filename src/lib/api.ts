@@ -99,6 +99,8 @@ export interface ArchivePage<T> {
   items: T[];
   total: number;
   nextOffset: number | null;
+  startOffset?: number;
+  previousOffset?: number | null;
   targetId?: string;
 }
 
@@ -288,7 +290,6 @@ const getTweetPageCached = cache(async (
   const limit = Math.min(Math.max(requestedLimit, 1), 5000);
   let start = Math.min(offset, tweets.length);
   let end = Math.min(start + limit, tweets.length);
-  let total = tweets.length;
   let targetId: string | undefined;
 
   if (offset === 0 && targetDate) {
@@ -298,13 +299,14 @@ const getTweetPageCached = cache(async (
       targetId = tweets[targetIndex].id;
       start = targetIndex;
       end = Math.min(start + limit, tweets.length);
-      total = tweets.length - start;
     }
   }
 
   return {
     items: tweets.slice(start, end),
-    total,
+    total: tweets.length,
+    startOffset: start,
+    previousOffset: start > 0 ? Math.max(0, start - limit) : null,
     nextOffset: end < tweets.length ? end : null,
     targetId,
   };

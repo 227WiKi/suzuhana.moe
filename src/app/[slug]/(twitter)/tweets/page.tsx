@@ -20,7 +20,8 @@ export default async function TweetsPage({ params, searchParams }: PageProps) {
     <TweetList 
       key={date || "latest"}
       initialTweets={page.items}
-      total={page.total}
+      initialOffset={page.startOffset ?? 0}
+      initialPreviousOffset={page.previousOffset ?? null}
       nextOffset={page.nextOffset}
       targetTweetId={page.targetId}
       slug={slug}
