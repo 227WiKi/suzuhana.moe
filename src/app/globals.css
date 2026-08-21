@@ -272,3 +272,11 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
   scroll-behavior: smooth;
 }
+
+/* GLightbox's overflow:hidden turns the root into a scroll container and
+   breaks the page's sticky sidebars. MediaGrid owns the background scroll
+   lock while the lightbox is open. */
+html.glightbox-open,
+body.glightbox-open {
+  overflow: visible !important;
+}

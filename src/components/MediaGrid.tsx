@@ -11,6 +11,15 @@ import { Dialog, DialogContent, DialogTitle } from "./ui/dialog";
 import "glightbox/dist/css/glightbox.min.css";
 
 const BATCH_SIZE = 15;
+const LIGHTBOX_SCROLL_KEYS = new Set([
+  "ArrowDown",
+  "ArrowUp",
+  "End",
+  "Home",
+  "PageDown",
+  "PageUp",
+  " ",
+]);
 type LightboxInstance = ReturnType<typeof GLightboxFactory>;
 type LightboxModule = { default: typeof GLightboxFactory };
 interface LightboxWithSlideEvents {
@@ -134,6 +143,29 @@ export default function MediaGrid({ initialItems, total, nextOffset: initialNext
   }, [loadMore, nextOffset]);
 
   useEffect(() => () => lightboxRef.current?.destroy(), []);
+
+  useEffect(() => {
+    if (!isLightboxOpen) return;
+
+    const preventBackgroundScroll = (event: Event) => event.preventDefault();
+    const preventBackgroundScrollKey = (event: KeyboardEvent) => {
+      const target = event.target;
+      const isInteractiveTarget = target instanceof HTMLElement
+        && Boolean(target.closest("button, a, input, select, textarea, [role='button']"));
+      if (LIGHTBOX_SCROLL_KEYS.has(event.key) && !(event.key === " " && isInteractiveTarget)) {
+        event.preventDefault();
+      }
+    };
+
+    window.addEventListener("wheel", preventBackgroundScroll, { passive: false });
+    window.addEventListener("touchmove", preventBackgroundScroll, { passive: false });
+    window.addEventListener("keydown", preventBackgroundScrollKey);
+    return () => {
+      window.removeEventListener("wheel", preventBackgroundScroll);
+      window.removeEventListener("touchmove", preventBackgroundScroll);
+      window.removeEventListener("keydown", preventBackgroundScrollKey);
+    };
+  }, [isLightboxOpen]);
 
   const openLightbox = useCallback(async (clickedItem: MediaArchiveItem) => {
     preloadLightbox();
