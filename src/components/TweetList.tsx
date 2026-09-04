@@ -5,6 +5,7 @@ import { motion, useAnimationControls, useReducedMotion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { ArchivePage, ArchiveUser, Tweet } from "@/lib/api";
+import { appendArchiveFilters, type ArchiveFilters } from "@/lib/archive-filters";
 import { ARCHIVE_SCROLL_TO_TOP_EVENT } from "@/lib/ui-events";
 import TweetCard from "./TweetCard";
 
@@ -18,6 +19,16 @@ interface TweetListProps {
   targetTweetId?: string;
   slug: string;
   user: ArchiveUser;
+  filters: ArchiveFilters;
+}
+
+function getTweetPageUrl(slug: string, offset: number, limit: number, filters: ArchiveFilters) {
+  const params = new URLSearchParams({
+    offset: String(offset),
+    limit: String(limit),
+  });
+  appendArchiveFilters(params, filters);
+  return `/api/archive/${encodeURIComponent(slug)}/tweets?${params.toString()}`;
 }
 
 export default function TweetList({
@@ -28,6 +39,7 @@ export default function TweetList({
   targetTweetId,
   slug,
   user,
+  filters,
 }: TweetListProps) {
   const [tweets, setTweets] = useState(initialTweets);
   const [currentOffset, setCurrentOffset] = useState(initialOffset);
@@ -80,7 +92,7 @@ export default function TweetList({
     setIsLoadingPrevious(true);
     try {
       const response = await fetch(
-        `/api/archive/${encodeURIComponent(slug)}/tweets?offset=${requestOffset}&limit=${requestLimit}`,
+        getTweetPageUrl(slug, requestOffset, requestLimit, filters),
       );
       if (!response.ok) throw new Error(`Previous tweet page returned ${response.status}`);
       const page = await response.json() as ArchivePage<Tweet>;
@@ -109,13 +121,13 @@ export default function TweetList({
     } finally {
       setIsLoadingPrevious(false);
     }
-  }, [currentOffset, isLoadingPrevious, previousOffset, slug, tweets]);
+  }, [currentOffset, filters, isLoadingPrevious, previousOffset, slug, tweets]);
 
   const loadMore = useCallback(async () => {
     if (nextOffset === null || isLoading) return;
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/archive/${encodeURIComponent(slug)}/tweets?offset=${nextOffset}&limit=${BATCH_SIZE}`);
+      const response = await fetch(getTweetPageUrl(slug, nextOffset, BATCH_SIZE, filters));
       if (!response.ok) throw new Error(`Tweet page returned ${response.status}`);
       const page = await response.json() as ArchivePage<Tweet>;
       setTweets((current) => {
@@ -129,7 +141,7 @@ export default function TweetList({
     } finally {
       setIsLoading(false);
     }
-  }, [isLoading, nextOffset, slug]);
+  }, [filters, isLoading, nextOffset, slug]);
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
@@ -254,7 +266,7 @@ export default function TweetList({
       {isLoadingPrevious && (
         <div
           className="absolute inset-x-0 top-3 z-10 flex justify-center text-blue-500 pointer-events-none"
-          aria-label="Loading newer tweets"
+          aria-label="正在载入此前的贴文"
         >
           <Loader2 className="w-6 h-6 animate-spin" />
         </div>
@@ -269,6 +281,12 @@ export default function TweetList({
           <TweetCard tweet={tweet} user={user} />
         </div>
       ))}
+
+      {tweets.length === 0 && (
+        <div className="rounded-2xl border border-dashed border-gray-200 px-6 py-14 text-center text-sm font-medium text-gray-400 dark:border-gray-800">
+          没有符合该日期范围的贴文。
+        </div>
+      )}
 
       {nextOffset !== null && (
         <div ref={sentinelRef} className="py-8 flex justify-center text-blue-500">

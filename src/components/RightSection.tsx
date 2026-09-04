@@ -1,9 +1,10 @@
 interface RightSectionProps {
   children?: React.ReactNode;
+  afterAbout?: React.ReactNode;
   profile?: boolean;
 }
 
-export default function RightSection({ children, profile = false }: RightSectionProps) {
+export default function RightSection({ children, afterAbout, profile = false }: RightSectionProps) {
   return (
     <div 
       className={`
@@ -23,6 +24,8 @@ export default function RightSection({ children, profile = false }: RightSection
           22/7 成员社交媒体的数字留档
         </div>
       </div>
+
+      {afterAbout}
 
       <div className="text-center text-sm text-gray-500 dark:text-gray-400 px-4 leading-relaxed">
         <span>

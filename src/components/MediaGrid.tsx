@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { AlertCircle, Heart, Info, Loader2, Play, X } from "lucide-react";
 import type { ArchivePage, ArchiveUser, Media, MediaArchiveItem, Tweet } from "@/lib/api";
+import { appendArchiveFilters, type ArchiveFilters } from "@/lib/archive-filters";
 import { loadGLightbox, preloadGLightbox, type LightboxInstance, type LightboxOptions } from "@/lib/glightbox";
 import TweetCard from "./TweetCard";
 import { Dialog, DialogContent, DialogTitle } from "./ui/dialog";
@@ -83,6 +84,16 @@ interface MediaGridProps {
   nextOffset: number | null;
   slug: string;
   user: ArchiveUser;
+  filters: ArchiveFilters;
+}
+
+function getMediaPageUrl(slug: string, offset: number, limit: number, filters: ArchiveFilters) {
+  const params = new URLSearchParams({
+    offset: String(offset),
+    limit: String(limit),
+  });
+  appendArchiveFilters(params, filters);
+  return `/api/archive/${encodeURIComponent(slug)}/media?${params.toString()}`;
 }
 
 function subscribeToViewport(callback: () => void) {
@@ -90,7 +101,7 @@ function subscribeToViewport(callback: () => void) {
   return () => window.removeEventListener("resize", callback);
 }
 
-export default function MediaGrid({ initialItems, total, nextOffset: initialNextOffset, slug, user }: MediaGridProps) {
+export default function MediaGrid({ initialItems, total, nextOffset: initialNextOffset, slug, user, filters }: MediaGridProps) {
   const [items, setItems] = useState(initialItems);
   const [nextOffset, setNextOffset] = useState(initialNextOffset);
   const [isLoading, setIsLoading] = useState(false);
@@ -115,7 +126,7 @@ export default function MediaGrid({ initialItems, total, nextOffset: initialNext
     if (nextOffset === null || isLoading) return;
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/archive/${encodeURIComponent(slug)}/media?offset=${nextOffset}&limit=${BATCH_SIZE}`);
+      const response = await fetch(getMediaPageUrl(slug, nextOffset, BATCH_SIZE, filters));
       if (!response.ok) throw new Error(`Media page returned ${response.status}`);
       const page = await response.json() as ArchivePage<MediaArchiveItem>;
       setItems((current) => [...current, ...page.items]);
@@ -125,7 +136,7 @@ export default function MediaGrid({ initialItems, total, nextOffset: initialNext
     } finally {
       setIsLoading(false);
     }
-  }, [isLoading, nextOffset, slug]);
+  }, [filters, isLoading, nextOffset, slug]);
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
@@ -168,7 +179,7 @@ export default function MediaGrid({ initialItems, total, nextOffset: initialNext
       loadGLightbox(),
       items.length >= total
         ? Promise.resolve(null)
-        : fetch(`/api/archive/${encodeURIComponent(slug)}/media?offset=0&limit=${total}`),
+        : fetch(getMediaPageUrl(slug, 0, total, filters)),
     ]);
     let archiveItems = items;
     if (response) {
@@ -208,9 +219,15 @@ export default function MediaGrid({ initialItems, total, nextOffset: initialNext
     });
     lightboxRef.current = instance;
     instance.openAt(Math.max(clickedIndex, 0));
-  }, [items, slug, total]);
+  }, [filters, items, slug, total]);
 
-  if (items.length === 0) return <div className="p-10 text-center text-gray-500">No media found.</div>;
+  if (items.length === 0) {
+    return (
+      <div className="rounded-2xl border border-dashed border-gray-200 px-6 py-14 text-center text-sm font-medium text-gray-400 dark:border-gray-800">
+        没有符合该日期范围的媒体。
+      </div>
+    );
+  }
 
   return (
     <>

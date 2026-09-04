@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getMemberBySlug } from "@/lib/members";
 import { getMediaPage } from "@/lib/api";
+import { normalizeArchiveFilters } from "@/lib/archive-filters";
 
 export async function GET(
   request: NextRequest,
@@ -13,10 +14,16 @@ export async function GET(
 
   const offset = Number.parseInt(request.nextUrl.searchParams.get("offset") || "0", 10);
   const limit = Number.parseInt(request.nextUrl.searchParams.get("limit") || "15", 10);
+  const filters = normalizeArchiveFilters({
+    from: request.nextUrl.searchParams.get("from"),
+    to: request.nextUrl.searchParams.get("to"),
+    order: request.nextUrl.searchParams.get("order"),
+  });
   const page = await getMediaPage(
     slug,
     Number.isFinite(offset) ? offset : 0,
     Number.isFinite(limit) ? limit : 15,
+    filters,
   );
 
   return NextResponse.json(page, {

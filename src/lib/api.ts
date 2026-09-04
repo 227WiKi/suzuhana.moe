@@ -2,6 +2,12 @@ import "server-only";
 
 import { cache } from "react";
 import { archiveRegistry, type ArchiveJsonLoader } from "../generated/archive-registry";
+import {
+  applyArchiveFilters,
+  DEFAULT_ARCHIVE_FILTERS,
+  normalizeArchiveFilters,
+  type ArchiveFilters,
+} from "./archive-filters";
 import { getAllMembers, getMemberBySlug } from "./members";
 
 export interface Media {
@@ -281,8 +287,15 @@ const getTweetPageCached = cache(async (
   offset: number,
   requestedLimit: number,
   targetDate: string,
+  from: string,
+  to: string,
+  order: ArchiveFilters["order"],
 ): Promise<ArchivePage<Tweet>> => {
-  const tweets = await getTweets(slug);
+  const tweets = applyArchiveFilters(
+    await getTweets(slug),
+    { from, to, order },
+    (tweet) => tweet.date,
+  );
   const limit = Math.min(Math.max(requestedLimit, 1), 5000);
   let start = Math.min(offset, tweets.length);
   let end = Math.min(start + limit, tweets.length);
@@ -290,7 +303,11 @@ const getTweetPageCached = cache(async (
 
   if (offset === 0 && targetDate) {
     const normalizedDate = targetDate.substring(0, 10);
-    const targetIndex = tweets.findIndex((tweet) => tweet.date.substring(0, 10) <= normalizedDate);
+    const targetIndex = tweets.findIndex((tweet) => (
+      order === "asc"
+        ? tweet.date.substring(0, 10) >= normalizedDate
+        : tweet.date.substring(0, 10) <= normalizedDate
+    ));
     if (targetIndex >= 0) {
       targetId = tweets[targetIndex].id;
       start = targetIndex;
@@ -308,12 +325,36 @@ const getTweetPageCached = cache(async (
   };
 });
 
-export function getTweetPage(slug: string, offset = 0, limit = 20, targetDate = "") {
-  return getTweetPageCached(slug, Math.max(offset, 0), limit, targetDate);
+export function getTweetPage(
+  slug: string,
+  offset = 0,
+  limit = 20,
+  targetDate = "",
+  inputFilters: ArchiveFilters = DEFAULT_ARCHIVE_FILTERS,
+) {
+  const filters = normalizeArchiveFilters(inputFilters);
+  return getTweetPageCached(
+    slug,
+    Math.max(offset, 0),
+    limit,
+    targetDate,
+    filters.from,
+    filters.to,
+    filters.order,
+  );
 }
 
-const getMediaArchive = cache(async (slug: string): Promise<MediaArchiveItem[]> => {
-  const tweets = await getTweets(slug);
+const getMediaArchive = cache(async (
+  slug: string,
+  from: string,
+  to: string,
+  order: ArchiveFilters["order"],
+): Promise<MediaArchiveItem[]> => {
+  const tweets = applyArchiveFilters(
+    await getTweets(slug),
+    { from, to, order },
+    (tweet) => tweet.date,
+  );
   return tweets.flatMap((tweet) => tweet.media.map((media) => ({ media, tweet })));
 });
 
@@ -321,8 +362,11 @@ const getMediaPageCached = cache(async (
   slug: string,
   offset: number,
   requestedLimit: number,
+  from: string,
+  to: string,
+  order: ArchiveFilters["order"],
 ): Promise<ArchivePage<MediaArchiveItem>> => {
-  const media = await getMediaArchive(slug);
+  const media = await getMediaArchive(slug, from, to, order);
   const limit = Math.min(Math.max(requestedLimit, 1), 5000);
   const end = Math.min(offset + limit, media.length);
   return {
@@ -332,8 +376,21 @@ const getMediaPageCached = cache(async (
   };
 });
 
-export function getMediaPage(slug: string, offset = 0, limit = 15) {
-  return getMediaPageCached(slug, Math.max(offset, 0), limit);
+export function getMediaPage(
+  slug: string,
+  offset = 0,
+  limit = 15,
+  inputFilters: ArchiveFilters = DEFAULT_ARCHIVE_FILTERS,
+) {
+  const filters = normalizeArchiveFilters(inputFilters);
+  return getMediaPageCached(
+    slug,
+    Math.max(offset, 0),
+    limit,
+    filters.from,
+    filters.to,
+    filters.order,
+  );
 }
 
 export const getProfile = cache(async (slug: string): Promise<ProfileData | null> => {
