@@ -40,7 +40,7 @@ export default function RightSection({ children, afterAbout, profile = false }: 
           , part of{' '}
           <span className="inline-flex items-center gap-1 align-bottom">
             <img
-              src="https://nananiji.zzzhxxx.top/assets/home/logo.svg"
+              src="/images/wiki-logo.svg"
               alt="22/7 Wiki"
               className="w-4 h-4"
             />

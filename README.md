@@ -109,8 +109,8 @@ wrangler.toml                 # Cloudflare Worker 配置
   "height": "162cm",
   "message": "土踏まずがないことが密かな悩みです。よろしくお願いします！",
   "assets": {
-    "formula": "https://nananiji.zzzhxxx.top/assets/photo/kanae/11th.jpeg",
-    "signature": "https://nananiji.zzzhxxx.top/assets/kanae-sig.svg",
+    "formula": "https://res.227wiki.eu.org/photo/kanae/11th.jpeg",
+    "signature": "/images/signature/kanae-sig.svg",
     "type": "vertical"
   }
 }
