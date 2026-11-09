@@ -33,29 +33,29 @@ interface InstagramVideoPlayerProps {
 }
 
 const playerStyle = {
-  "--media-primary-color": "#fff",
+  "--media-primary-color": "var(--media-foreground)",
   "--media-secondary-color": "transparent",
   "--media-control-background": "transparent",
-  "--media-control-hover-background": "rgb(255 255 255 / 0.12)",
-  "--media-control-padding": "7px",
-  "--media-button-padding": "7px",
-  "--media-control-height": "18px",
-  "--media-button-icon-width": "18px",
-  "--media-button-icon-height": "18px",
+  "--media-control-hover-background": "var(--media-control-hover)",
+  "--media-control-padding": "12px",
+  "--media-button-padding": "12px",
+  "--media-control-height": "16px",
+  "--media-button-icon-width": "16px",
+  "--media-button-icon-height": "16px",
   "--media-font-family": "var(--font-sans)",
-  "--media-font-size": "11px",
+  "--media-font-size": "12px",
   "--media-font-weight": "700",
-  "--media-range-track-height": "3px",
+  "--media-range-track-height": "4px",
   "--media-range-track-border-radius": "999px",
-  "--media-range-track-background": "rgb(255 255 255 / 0.22)",
-  "--media-range-bar-color": "#fff",
-  "--media-range-thumb-background": "#fff",
-  "--media-range-thumb-width": "9px",
-  "--media-range-thumb-height": "9px",
-  "--media-range-thumb-box-shadow": "0 1px 5px rgb(0 0 0 / 0.35)",
+  "--media-range-track-background": "var(--media-track)",
+  "--media-range-bar-color": "var(--media-foreground)",
+  "--media-range-thumb-background": "var(--media-foreground)",
+  "--media-range-thumb-width": "8px",
+  "--media-range-thumb-height": "8px",
+  "--media-range-thumb-box-shadow": "none",
   "--media-loading-indicator-icon-width": "32px",
   "--media-loading-indicator-icon-height": "32px",
-  "--media-focus-box-shadow": "inset 0 0 0 2px rgb(255 255 255 / 0.9)",
+  "--media-focus-box-shadow": "inset 0 0 0 2px var(--media-focus)",
 } as CSSProperties;
 
 const outlineIconStyle = { fill: "none" } as CSSProperties;
@@ -102,13 +102,14 @@ export default function InstagramVideoPlayer({
       video.removeEventListener("error", reportError);
       video.pause();
     };
-  }, [src]);
+  }, [src, hasError]);
 
   if (hasError) {
     return (
-      <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-zinc-950 text-sm text-zinc-400">
-        <AlertCircle size={28} className="opacity-70" />
+      <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-zinc-950 text-sm text-muted-foreground">
+        <AlertCircle size={16} aria-hidden="true" />
         <span>视频无法加载</span>
+        <button type="button" onClick={() => setHasError(false)} className="control-size mt-2 rounded-lg px-3 underline">重试</button>
       </div>
     );
   }
@@ -135,46 +136,44 @@ export default function InstagramVideoPlayer({
         onClick={togglePlayback}
         className="absolute inset-0 z-10 cursor-pointer bg-transparent outline-none"
       />
-      <MediaLoadingIndicator className="instagram-video-loading pointer-events-none absolute inset-0 m-auto h-12 w-12 rounded-full border border-white/10 bg-black/35 p-2 shadow-lg backdrop-blur-md" />
-
-      <div className="instagram-video-scrim pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/65 via-black/20 to-transparent transition-opacity duration-200" />
+      <MediaLoadingIndicator className="instagram-video-loading pointer-events-none absolute inset-0 m-auto h-12 w-12 rounded-full border border-white/10 bg-black/35 p-2 shadow-sm" />
 
       <MediaPlayButton
         aria-label="播放或暂停"
-        className="instagram-video-center-play absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/70 bg-white/90 p-4 text-zinc-950 shadow-[0_10px_35px_rgba(0,0,0,0.28)] backdrop-blur-xl transition-[opacity,transform,background-color] duration-200 hover:bg-white"
-        style={{ "--media-primary-color": "#18181b" } as CSSProperties}
+        className="instagram-video-center-play absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/70 bg-brand-instagram p-4 text-brand-instagram-foreground shadow-sm transition-[opacity,transform,background-color] duration-200 hover:bg-white"
+        style={{ "--media-primary-color": "var(--brand-instagram-foreground)" } as CSSProperties}
       >
         <Play slot="play" size={24} strokeWidth={2.2} style={{ fill: "currentColor" }} />
         <Pause slot="pause" size={24} strokeWidth={2.2} style={{ fill: "currentColor" }} />
       </MediaPlayButton>
 
-      <MediaControlBar className="instagram-video-controls absolute inset-x-3 bottom-3 z-30 flex min-h-11 items-center gap-0.5 rounded-xl border border-white/15 bg-zinc-950/75 px-1.5 text-white shadow-[0_10px_30px_rgba(0,0,0,0.28)] backdrop-blur-xl transition-[opacity,transform] duration-200 sm:inset-x-4 sm:bottom-4 sm:px-2">
+      <MediaControlBar className="instagram-video-controls absolute inset-x-3 bottom-3 z-30 flex control-size items-center gap-1 rounded-xl border border-white/15 bg-zinc-950/75 px-2 text-white shadow-sm transition-[opacity,transform] duration-200 sm:inset-x-4 sm:bottom-4 sm:px-2">
         <MediaPlayButton aria-label="播放或暂停" className="rounded-lg">
-          <Play slot="play" size={18} strokeWidth={2.2} style={{ fill: "currentColor" }} />
-          <Pause slot="pause" size={18} strokeWidth={2.2} style={{ fill: "currentColor" }} />
+          <Play slot="play" size={16} strokeWidth={2.2} style={{ fill: "currentColor" }} />
+          <Pause slot="pause" size={16} strokeWidth={2.2} style={{ fill: "currentColor" }} />
         </MediaPlayButton>
         <MediaTimeDisplay
           showDuration
           noToggle
-          className="hidden whitespace-nowrap font-mono text-[11px] font-bold tabular-nums text-white/75 sm:inline-flex"
+          className="hidden whitespace-nowrap font-mono text-xs font-bold tabular-nums text-white/75 sm:inline-flex"
         />
         <MediaTimeRange className="min-w-16 flex-1" />
         <div className="instagram-video-volume flex shrink-0 items-center">
           <MediaMuteButton aria-label="静音或取消静音" className="rounded-lg">
-            <VolumeX slot="off" size={18} strokeWidth={2} style={outlineIconStyle} />
-            <Volume1 slot="low" size={18} strokeWidth={2} style={outlineIconStyle} />
-            <Volume2 slot="medium" size={18} strokeWidth={2} style={outlineIconStyle} />
-            <Volume2 slot="high" size={18} strokeWidth={2} style={outlineIconStyle} />
+            <VolumeX slot="off" size={16} strokeWidth={2} style={outlineIconStyle} />
+            <Volume1 slot="low" size={16} strokeWidth={2} style={outlineIconStyle} />
+            <Volume2 slot="medium" size={16} strokeWidth={2} style={outlineIconStyle} />
+            <Volume2 slot="high" size={16} strokeWidth={2} style={outlineIconStyle} />
           </MediaMuteButton>
           <MediaVolumeRange className="instagram-video-volume-range" />
         </div>
         <MediaPipButton aria-label="画中画" className="hidden rounded-lg sm:inline-flex">
-          <PictureInPicture2 slot="enter" size={18} strokeWidth={2} style={outlineIconStyle} />
-          <PictureInPicture2 slot="exit" size={18} strokeWidth={2} style={outlineIconStyle} />
+          <PictureInPicture2 slot="enter" size={16} strokeWidth={2} style={outlineIconStyle} />
+          <PictureInPicture2 slot="exit" size={16} strokeWidth={2} style={outlineIconStyle} />
         </MediaPipButton>
         <MediaFullscreenButton aria-label="全屏" className="rounded-lg">
-          <Maximize slot="enter" size={18} strokeWidth={2} style={outlineIconStyle} />
-          <Minimize slot="exit" size={18} strokeWidth={2} style={outlineIconStyle} />
+          <Maximize slot="enter" size={16} strokeWidth={2} style={outlineIconStyle} />
+          <Minimize slot="exit" size={16} strokeWidth={2} style={outlineIconStyle} />
         </MediaFullscreenButton>
       </MediaControlBar>
 

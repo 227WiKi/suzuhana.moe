@@ -42,22 +42,55 @@
 @variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #ffffff;
+  --background: #f9fafb;
   --foreground: #171717;
-  --secondary: #f5f5f5;
+  --card: #ffffff;
+  --muted: #f3f4f6;
+  --muted-foreground: #626a78;
+  --border: #e3e5e9;
+  --accent: #0078b5;
+  --accent-hover: #005f8f;
+  --accent-solid: #006ea6;
+  --destructive: #b91c1c;
+  --brand-start: #ff99cc;
+  --brand-end: #ffccff;
+  --brand-x: #000000;
+  --brand-x-hover: #202020;
+  --brand-x-foreground: #ffffff;
+  --brand-instagram: #ffffff;
+  --brand-instagram-hover: #f5f5f5;
+  --brand-instagram-foreground: #171717;
+  --social-twitter: #0f1419;
+  --social-instagram: #c13584;
+  --social-blog: #14804a;
+  --media-background: #000000;
+  --media-foreground: #ffffff;
+  --media-control-hover: rgb(255 255 255 / 12%);
+  --media-track: rgb(255 255 255 / 22%);
+  --media-focus: rgb(255 255 255 / 90%);
+  --secondary: var(--muted);
   --radius: 0.625rem;
 }
 
 .dark {
   --background: #000000;
   --foreground: #ededed;
-  --secondary: #27272a;
+  --card: #16181c;
+  --muted: #27272a;
+  --muted-foreground: #a4acb8;
+  --border: #343941;
+  --accent: #79ceff;
+  --accent-hover: #b4e7ff;
+  --destructive: #fca5a5;
+  --social-twitter: #e7e9ea;
+  --social-instagram: #f18ac0;
+  --social-blog: #65d49a;
 }
 
 @keyframes flash-highlight {
   0% {
-    background-color: rgba(0, 140, 210, 0.2);
-    box-shadow: 0 0 0 2px rgba(0, 140, 210, 0.5);
+    background-color: color-mix(in srgb, var(--accent) 12%, transparent);
+
   }
 
   100% {
@@ -71,19 +104,19 @@
 }
 
 .archive-calendar {
-  --rdp-accent-color: #008cd2;
-  --rdp-accent-background-color: #008cd2;
-  --rdp-day-height: 36px;
+  --rdp-accent-color: var(--accent-solid);
+  --rdp-accent-background-color: var(--accent-solid);
+  --rdp-day-height: 40px;
   --rdp-day-width: 40px;
   --rdp-day_button-height: 32px;
   --rdp-day_button-width: 32px;
   --rdp-nav-height: 40px;
-  --rdp-nav_button-height: 28px;
-  --rdp-nav_button-width: 28px;
+  --rdp-nav_button-height: 32px;
+  --rdp-nav_button-width: 32px;
   --rdp-weekday-opacity: 1;
   --rdp-disabled-opacity: 0.22;
   width: 100%;
-  color: #374151;
+  color: var(--foreground);
   font-size: 0.875rem;
 }
 
@@ -121,7 +154,7 @@
 .archive-calendar .rdp-month_caption {
   padding-left: 24px;
   font-size: 0.875rem;
-  color: #111827;
+  color: var(--foreground);
 }
 
 .archive-calendar .rdp-dropdowns {
@@ -133,29 +166,29 @@
 }
 
 .archive-calendar .rdp-dropdown_root:hover .rdp-caption_label {
-  color: #008cd2;
+  color: var(--accent-solid);
 }
 
 .archive-calendar .rdp-button_previous,
 .archive-calendar .rdp-button_next {
   border-radius: 9999px;
-  color: #6b7280;
+  color: var(--muted-foreground);
   transition: background-color 150ms ease;
 }
 
 .archive-calendar .rdp-button_previous:hover:not(:disabled),
 .archive-calendar .rdp-button_next:hover:not(:disabled) {
-  background: #f3f4f6;
+  background: var(--muted);
 }
 
 .archive-calendar .rdp-chevron {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   fill: currentColor;
 }
 
 .archive-calendar .rdp-weekday {
-  color: #9ca3af;
+  color: var(--muted-foreground);
   font-size: 0.75rem;
   font-weight: 700;
 }
@@ -169,8 +202,8 @@
 .archive-calendar .rdp-day:not(.rdp-disabled) .rdp-day_button:hover,
 .archive-calendar .rdp-selected .rdp-day_button {
   border-color: transparent;
-  background: #008cd2;
-  color: white;
+  background: var(--accent-solid);
+  color: var(--media-foreground);
   font-size: 0.875rem;
   font-weight: 700;
 }
@@ -180,16 +213,16 @@
 }
 
 .dark .archive-calendar {
-  color: #d1d5db;
+  color: var(--foreground);
 }
 
 .dark .archive-calendar .rdp-month_caption {
-  color: white;
+  color: var(--foreground);
 }
 
 .dark .archive-calendar .rdp-button_previous:hover:not(:disabled),
 .dark .archive-calendar .rdp-button_next:hover:not(:disabled) {
-  background: #1f2937;
+  background: var(--muted);
 }
 
 .archive-filter-calendar .rdp-month_caption {
@@ -197,32 +230,32 @@
 }
 
 .archive-filter-calendar {
-  --rdp-day-height: 34px;
-  --rdp-day_button-height: 34px;
-  --rdp-day_button-width: 34px;
-  --rdp-range_middle-background-color: rgb(0 140 210 / 12%);
+  --rdp-day-height: 40px;
+  --rdp-day_button-height: 36px;
+  --rdp-day_button-width: 36px;
+  --rdp-range_middle-background-color: color-mix(in srgb, var(--accent) 12%, transparent);
 }
 
 .archive-filter-calendar .rdp-range_middle .rdp-day_button {
   border-radius: 0;
   background: transparent;
-  color: #0078b5;
+  color: var(--accent);
 }
 
 .archive-filter-calendar .rdp-range_start .rdp-day_button,
 .archive-filter-calendar .rdp-range_end .rdp-day_button {
   border-color: transparent;
-  background: #008cd2;
-  color: white;
+  background: var(--accent-solid);
+  color: var(--media-foreground);
 }
 
 .dark .archive-filter-calendar .rdp-range_middle .rdp-day_button {
   background: transparent;
-  color: #7dd3fc;
+  color: var(--accent);
 }
 
 .dark .archive-filter-calendar {
-  --rdp-range_middle-background-color: rgb(0 140 210 / 22%);
+  --rdp-range_middle-background-color: color-mix(in srgb, var(--accent) 22%, transparent);
 }
 
 @keyframes calendar-select-in {
@@ -276,6 +309,27 @@
 }
 
 @theme inline {
+  --color-card: var(--card);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-solid: var(--accent-solid);
+  --color-destructive: var(--destructive);
+  --color-brand-start: var(--brand-start);
+  --color-brand-end: var(--brand-end);
+  --color-brand-x: var(--brand-x);
+  --color-brand-x-hover: var(--brand-x-hover);
+  --color-brand-x-foreground: var(--brand-x-foreground);
+  --color-brand-instagram: var(--brand-instagram);
+  --color-brand-instagram-hover: var(--brand-instagram-hover);
+  --color-brand-instagram-foreground: var(--brand-instagram-foreground);
+  --color-social-twitter: var(--social-twitter);
+  --color-social-instagram: var(--social-instagram);
+  --color-social-blog: var(--social-blog);
+  --color-media-background: var(--media-background);
+  --color-media-foreground: var(--media-foreground);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: 'LINE Seed JP', "PingFang SC", "Microsoft YaHei", Arial, Helvetica, sans-serif;
@@ -311,7 +365,7 @@ body {
   color: var(--foreground);
   font-family: 'LINE Seed JP', "PingFang SC", "Microsoft YaHei", Arial, Helvetica, sans-serif;
   transition: background-color 0.3s ease, color 0.3s ease;
-  scroll-behavior: smooth;
+
 }
 
 /* GLightbox's overflow:hidden turns the root into a scroll container and
@@ -320,4 +374,96 @@ body {
 html.glightbox-open,
 body.glightbox-open {
   overflow: visible !important;
+}
+
+/* Shared custom control sizes. Native media-chrome controls use the same touch target. */
+.control-size { min-height: 40px; }
+.icon-control { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; }
+
+@media (pointer: coarse), (max-width: 767px) {
+  .control-size, .icon-control, .touch-target { min-width: 44px; min-height: 44px; }
+  .archive-calendar {
+    --rdp-day-height: 44px;
+    --rdp-day-width: 44px;
+    --rdp-day_button-height: 44px;
+    --rdp-day_button-width: 44px;
+    --rdp-nav-height: 44px;
+    --rdp-nav_button-height: 44px;
+    --rdp-nav_button-width: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .animate-fade-in-up { opacity: 1; transform: none; }
+  .highlight-pulse { animation: none; }
+}
+
+@keyframes hero-rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+
+.hero-rise {
+  animation: hero-rise 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* Homepage post feed. Shuffling swaps the two cards: both pull apart, away
+   from each other, change places in the stack at the widest point, then slide
+   back. The new stacking order is already set in state when the shuffle
+   starts; the rising card's keyframes hold it below the other card until the
+   halfway point, then above it for the slide back. */
+.feed-card {
+  z-index: var(--z);
+  rotate: var(--r);
+}
+
+.feed-card[data-shuffle="rise"] {
+  animation: feed-shuffle-rise 680ms cubic-bezier(0.45, 0, 0.25, 1);
+}
+
+.feed-card[data-shuffle="sink"] {
+  animation: feed-shuffle-sink 680ms cubic-bezier(0.45, 0, 0.25, 1);
+}
+
+@keyframes feed-shuffle-rise {
+  0% {
+    z-index: 0;
+    translate: 0 0;
+    rotate: var(--r);
+    scale: 1;
+  }
+  49.99% {
+    z-index: 0;
+  }
+  50% {
+    z-index: 3;
+    translate: var(--pull-x) var(--pull-y);
+    rotate: calc(var(--r) * 2.5);
+    scale: 1.03;
+  }
+  100% {
+    z-index: 3;
+    translate: 0 0;
+    rotate: var(--r);
+    scale: 1;
+  }
+}
+
+@keyframes feed-shuffle-sink {
+  0%, 100% {
+    translate: 0 0;
+    rotate: var(--r);
+    scale: 1;
+  }
+  50% {
+    translate: var(--pull-x) var(--pull-y);
+    rotate: calc(var(--r) * 2.5);
+    scale: 0.97;
+  }
 }

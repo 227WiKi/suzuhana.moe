@@ -20,18 +20,18 @@ export default function MobileNav({ slug, user, allUsers }: MobileNavProps) {
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <div
         data-archive-sticky-header
-        className="lg:hidden sticky top-0 z-40 w-full bg-white/80 dark:bg-[#16181c]/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 px-4 h-14 flex items-center justify-between"
+        className="lg:hidden sticky top-0 z-40 w-full bg-card/80 backdrop-blur-md border-b border-border px-4 h-14 flex items-center justify-between"
       >
         <SheetTrigger asChild>
-          <button className="relative group" aria-label="Open navigation">
+          <button className="icon-control relative group" aria-label="Open navigation">
             <img
               src={user.avatar}
               alt="Avatar"
-              className="w-8 h-8 rounded-full object-cover border border-gray-200 dark:border-gray-700"
+              className="w-8 h-8 rounded-full object-cover border border-border"
             />
           </button>
         </SheetTrigger>
-        <Link href="/" className="font-black text-lg tracking-tight text-gray-900 dark:text-white">
+        <Link href="/" className="font-black text-lg tracking-tight text-foreground">
           {user.name}
         </Link>
         <div className="w-8" />
@@ -40,15 +40,15 @@ export default function MobileNav({ slug, user, allUsers }: MobileNavProps) {
       <SheetContent
         side="left"
         showCloseButton={false}
-        className="lg:hidden w-[85vw] max-w-[300px] p-0 gap-0 border-none rounded-none bg-white dark:bg-[#16181c] text-gray-900 dark:text-white shadow-2xl"
+        className="lg:hidden w-[85vw] max-w-[300px] p-0 gap-0 border-none rounded-none bg-card text-foreground shadow-sm"
       >
         <SheetTitle className="sr-only">Navigation</SheetTitle>
         <button
           onClick={() => setIsOpen(false)}
-          className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-gray-500"
+          className="icon-control absolute top-4 right-4 p-2 rounded-full hover:bg-muted dark:hover:bg-white/10 text-muted-foreground"
           aria-label="Close navigation"
         >
-          <X size={24} />
+          <X size={16} aria-hidden="true" />
         </button>
         <div className="h-full overflow-y-auto pt-2 flex flex-col">
           <Sidebar

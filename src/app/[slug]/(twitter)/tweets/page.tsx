@@ -6,7 +6,7 @@ import FilteredArchiveResults from '@/components/FilteredArchiveResults';
 import { getArchiveFilterKey, normalizeArchiveFilters } from '@/lib/archive-filters';
 
 interface PageProps {
-  params: Promise<{ slug: string }>; 
+  params: Promise<{ slug: string }>;
   searchParams: Promise<{ date?: string; from?: string; to?: string; order?: string }>;
 }
 
@@ -21,11 +21,11 @@ export default async function TweetsPage({ params, searchParams }: PageProps) {
     getTweetCalendarData(slug),
   ]);
   if (!user) return notFound();
-  
+
   return (
     <>
       <ArchiveFilterBar
-        className="lg:hidden"
+        className="2xl:hidden"
         filters={filters}
         minDate={calendar?.start}
         maxDate={calendar?.end}

@@ -10,7 +10,7 @@ const themeScriptCompatibility = `
 
 export const metadata: Metadata = {
   title: "Suzuhana Moe Archive",
-  description: "A comprehensive archive of tweets and media.",
+  description: "An archive of X and Instagram posts from 22/7 members.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -21,7 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             bootstrap after the Workers production transform. */}
         <script dangerouslySetInnerHTML={{ __html: themeScriptCompatibility }} />
       </head>
-      <body className="font-sans antialiased bg-[#F9FAFB] dark:bg-black text-gray-900 dark:text-white">
+      <body className="font-sans antialiased bg-background dark:bg-black text-foreground">
         <AppProviders>
           {children}
           <FloatingActions />

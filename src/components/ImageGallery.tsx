@@ -5,14 +5,14 @@ import type { Media } from "@/lib/api";
 import { AlertCircle, Play } from "lucide-react";
 import { useLightbox } from "./LightboxProvider";
 
-function GalleryItem({ 
-  media, 
+function GalleryItem({
+  media,
   onClick,
-  className 
-}: { 
-  media: Media, 
+  className
+}: {
+  media: Media,
   onClick?: () => void,
-  className?: string 
+  className?: string
 }) {
   const [isError, setIsError] = useState(false);
   const isVideo = media.type === 'video';
@@ -21,22 +21,23 @@ function GalleryItem({
 
   if (isError) {
     return (
-      <div className={`w-full h-full bg-gray-100 dark:bg-gray-800 flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 p-2 text-center select-none border border-gray-200 dark:border-gray-700 ${className}`}>
-        <AlertCircle size={24} className="mb-2 opacity-50" />
-        <span className="text-[10px] sm:text-xs font-medium">媒体可能已被删除<br/>或无法加载</span>
+      <div className={`w-full h-full bg-muted flex flex-col items-center justify-center text-muted-foreground p-2 text-center select-none border border-border ${className}`}>
+        <AlertCircle size={16} aria-hidden="true" className="mb-2" />
+        <span className="text-sm">媒体加载失败</span>
+        <button type="button" onClick={() => setIsError(false)} className="control-size mt-2 rounded-lg px-3 text-sm underline">重试</button>
       </div>
     );
   }
 
   return (
-    <div 
+    <div
       onClick={onClick}
       className={`w-full h-full relative group cursor-pointer ${className}`}
     >
       {isVideo && !hasVideoPoster ? (
-        <video 
-          src={media.url} 
-          className="w-full h-full object-cover" 
+        <video
+          src={media.url}
+          className="w-full h-full object-cover"
           muted
           playsInline
           preload="metadata"
@@ -59,8 +60,8 @@ function GalleryItem({
 
       {isVideo && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/90 dark:bg-black/60 rounded-full flex items-center justify-center backdrop-blur-sm shadow-lg group-hover:scale-110 transition duration-300">
-            <Play size={20} className="fill-black dark:fill-white text-black dark:text-white ml-1" />
+          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/90 dark:bg-black/60 rounded-full flex items-center justify-center shadow-sm group-hover:scale-110 transition duration-300">
+            <Play size={20} className="fill-black dark:fill-white text-foreground ml-1" />
           </div>
         </div>
       )}
@@ -84,7 +85,7 @@ export default function ImageGallery({ media }: { media: Media[] }) {
 
   return (
     <div
-      className={`grid gap-0.5 rounded-xl overflow-hidden mt-3 border border-gray-200 dark:border-gray-800 ${gridClassName}`}
+      className={`grid gap-1 rounded-xl overflow-hidden mt-3 border border-border ${gridClassName}`}
       onPointerEnter={lightbox.preload}
     >
       {media.map((m, index) => {
@@ -92,9 +93,9 @@ export default function ImageGallery({ media }: { media: Media[] }) {
         const spanClass = isThreeLayout && index === 0 ? "row-span-2" : "";
 
         return (
-          <div key={m.url + index} className={`relative bg-gray-100 dark:bg-gray-900 overflow-hidden ${spanClass}`}>
-            <GalleryItem 
-              media={m} 
+          <div key={m.url + index} className={`relative bg-muted overflow-hidden ${spanClass}`}>
+            <GalleryItem
+              media={m}
               onClick={() => void lightbox.open(media, index)}
             />
           </div>

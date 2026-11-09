@@ -1,5 +1,6 @@
 "use client";
 
+import ArchiveEmptyState from "@/components/ArchiveEmptyState";
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
@@ -36,8 +37,10 @@ function MediaItem({ media, likes, onClick, onPreload }: {
   const hasVideoPoster = media.type === "video" && previewUrl !== media.url;
   if (isError) {
     return (
-      <div className="w-full aspect-square bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex flex-col items-center justify-center text-gray-400 p-2 rounded-xl mb-3">
-        <AlertCircle size={20} className="mb-2 opacity-50" />
+      <div className="w-full aspect-square bg-muted border border-border flex flex-col items-center justify-center text-muted-foreground p-2 rounded-xl mb-3">
+        <AlertCircle size={16} aria-hidden="true" className="mb-2" />
+        <p className="text-sm">媒体加载失败</p>
+        <button type="button" onClick={() => setIsError(false)} className="control-size mt-2 rounded-lg px-3 text-sm underline">重试</button>
       </div>
     );
   }
@@ -47,13 +50,13 @@ function MediaItem({ media, likes, onClick, onPreload }: {
       type="button"
       onClick={onClick}
       onPointerEnter={onPreload}
-      className="block w-full text-left relative group bg-gray-100 dark:bg-gray-900 rounded-xl overflow-hidden cursor-pointer border border-transparent dark:border-gray-800 mb-3 shadow-sm hover:shadow-md transition-shadow"
+      className="block w-full text-left relative group bg-muted rounded-xl overflow-hidden cursor-pointer border border-transparent dark:border-border mb-3 shadow-sm hover:shadow-md transition-shadow"
     >
       {media.type === "video" && !hasVideoPoster ? (
         <div className="w-full relative">
           <video src={media.url} className="w-full h-auto object-cover pointer-events-none" preload="metadata" muted onError={() => setIsError(true)} />
           <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-black/30 transition">
-            <div className="w-10 h-10 rounded-full bg-black/60 flex items-center justify-center backdrop-blur-sm shadow-lg">
+            <div className="w-10 h-10 rounded-full bg-black/60 flex items-center justify-center shadow-sm">
               <Play fill="white" className="text-white ml-1 w-4 h-4" />
             </div>
           </div>
@@ -68,8 +71,8 @@ function MediaItem({ media, likes, onClick, onPreload }: {
           alt="media"
         />
       )}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex items-end justify-start p-3">
-        <div className="flex items-center gap-1.5 text-white font-bold text-sm drop-shadow-md">
+      <div className="absolute inset-0 bg-media-background/60 opacity-0 group-hover:opacity-100 transition duration-300 flex items-end justify-start p-3">
+        <div className="flex items-center gap-2 text-white font-bold text-sm drop-shadow-md">
           <Heart fill="white" size={16} />
           <span>{likes}</span>
         </div>
@@ -108,6 +111,7 @@ export default function MediaGrid({ initialItems, total, nextOffset: initialNext
   const [activeSlideTweet, setActiveSlideTweet] = useState<Tweet | null>(null);
   const [isCardOpen, setIsCardOpen] = useState(false);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [isLightboxClosing, setIsLightboxClosing] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const lightboxRef = useRef<LightboxInstance | null>(null);
   const numColumns = useSyncExternalStore(subscribeToViewport, () => window.innerWidth < 768 ? 2 : 3, () => 3);
@@ -204,6 +208,13 @@ export default function MediaGrid({ initialItems, total, nextOffset: initialNext
       plyr: { config: {} },
     } as unknown as LightboxOptions;
     const instance = GLightbox(lightboxOptions);
+    // GLightbox emits "close" after its exit animation. Start the floating
+    // control's exit alongside it, while keeping the portal mounted.
+    const closeLightbox = instance.close.bind(instance);
+    instance.close = () => {
+      setIsLightboxClosing(true);
+      return closeLightbox();
+    };
     (instance as unknown as LightboxWithSlideEvents).on("slide_changed", (data) => {
       const currentItem = archiveItems[data.current.index];
       if (currentItem) setActiveSlideTweet(currentItem.tweet);
@@ -211,10 +222,12 @@ export default function MediaGrid({ initialItems, total, nextOffset: initialNext
     instance.on("open", () => {
       setActiveSlideTweet(clickedItem.tweet);
       setIsCardOpen(false);
+      setIsLightboxClosing(false);
       setIsLightboxOpen(true);
     });
     instance.on("close", () => {
       setIsLightboxOpen(false);
+      setIsLightboxClosing(false);
       setIsCardOpen(false);
     });
     lightboxRef.current = instance;
@@ -223,9 +236,7 @@ export default function MediaGrid({ initialItems, total, nextOffset: initialNext
 
   if (items.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-gray-200 px-6 py-14 text-center text-sm font-medium text-gray-400 dark:border-gray-800">
-        没有符合该日期范围的媒体。
-      </div>
+      <ArchiveEmptyState message="没有符合该日期范围的媒体。" href={`/${slug}/media`} label="查看全部媒体" />
     );
   }
 
@@ -253,22 +264,23 @@ export default function MediaGrid({ initialItems, total, nextOffset: initialNext
         </div>
       )}
 
-      {activeSlideTweet && isLightboxOpen && createPortal(
+      {activeSlideTweet && (isLightboxOpen || isLightboxClosing) && createPortal(
         <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 9_999_999 }}>
           <AnimatePresence>
-            {!isCardOpen && (
+            {isLightboxOpen && !isLightboxClosing && !isCardOpen && (
               <motion.button
                 key="view-btn"
+                aria-label="View post"
                 onClick={(event) => { event.stopPropagation(); setIsCardOpen(true); }}
                 initial={{ opacity: 0, y: -20, scale: 0.9 }}
                 animate={{ opacity: 1, y: 0, scale: 1, transition: { delay: 0.35, type: "spring", stiffness: 200, damping: 20 } }}
                 exit={{ opacity: 0, scale: 0.9, y: -10, transition: { duration: 0.2 } }}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="absolute top-4 left-4 sm:top-6 sm:left-6 pointer-events-auto bg-black/50 hover:bg-black/70 text-white backdrop-blur-md px-4 py-2 rounded-full flex items-center gap-2 border border-white/20 cursor-pointer shadow-lg"
+                className="absolute top-4 left-4 sm:top-6 sm:left-6 pointer-events-auto bg-black/50 hover:bg-black/70 text-white px-4 py-2 rounded-full flex items-center gap-2 border border-white/20 cursor-pointer shadow-sm"
               >
-                <Info size={18} />
-                <span className="text-sm font-bold hidden sm:inline">View Tweet</span>
+                <Info size={16} aria-hidden="true" />
+                <span className="text-sm font-bold hidden sm:inline">View post</span>
               </motion.button>
             )}
           </AnimatePresence>
@@ -280,22 +292,23 @@ export default function MediaGrid({ initialItems, total, nextOffset: initialNext
         {activeSlideTweet && (
           <DialogContent
             showCloseButton={false}
-            overlayClassName="z-[10000000] bg-black/60 backdrop-blur-sm"
-            className="z-[10000001] w-full max-w-lg p-0 bg-transparent dark:bg-transparent ring-0"
+            disableZoomAnimation
+            overlayClassName="z-[10000000] bg-black/60 duration-200"
+            className="media-tweet-dialog-content z-[10000001] w-full max-w-lg p-0 bg-transparent dark:bg-transparent ring-0"
           >
             <DialogTitle className="sr-only">Archived tweet details</DialogTitle>
             <motion.button
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              whileHover={{ scale: 1.1, color: "#ffffff" }}
+              whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={() => setIsCardOpen(false)}
-              className="absolute -top-12 right-0 p-2 text-white/80 transition cursor-pointer"
+              className="icon-control absolute -top-12 right-0 p-2 text-white/80 transition cursor-pointer"
               aria-label="Close tweet details"
             >
-              <X size={32} />
+              <X size={16} aria-hidden="true" />
             </motion.button>
-            <div className="shadow-2xl rounded-2xl overflow-hidden">
+            <div className="shadow-sm rounded-2xl overflow-hidden">
               <AnimatePresence mode="popLayout">
                 <motion.div
                   key={activeSlideTweet.id}
@@ -311,6 +324,22 @@ export default function MediaGrid({ initialItems, total, nextOffset: initialNext
           </DialogContent>
         )}
       </Dialog>
+      <style jsx global>{`
+        @keyframes media-tweet-out {
+          from { opacity: 1; scale: 1; }
+          to { opacity: 0; scale: 0.96; }
+        }
+
+        .media-tweet-dialog-content[data-state="closed"] {
+          animation: media-tweet-out 200ms ease-out forwards;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .media-tweet-dialog-content[data-state="closed"] {
+            animation-duration: 0.01ms;
+          }
+        }
+      `}</style>
     </>
   );
 }

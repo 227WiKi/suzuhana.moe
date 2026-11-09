@@ -75,11 +75,11 @@ export default function CalendarWidget({
   if (availableDateSet.size === 0) return null;
 
   return (
-    <div className="relative rounded-2xl border border-gray-100 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-[#16181c]">
+    <div className="relative rounded-2xl border border-border bg-white p-5 shadow-sm dark:border-border dark:bg-card">
       <CalendarIcon
         aria-hidden="true"
         size={16}
-        className="pointer-events-none absolute left-5 top-[34px] z-10 text-[#008CD2]"
+        className="pointer-events-none absolute left-5 top-8 z-10 text-muted-foreground"
       />
       <DayPicker
         key={`${selectedDateKey ?? maxDate ?? "archive-calendar"}:${fromDateKey}:${toDateKeyFilter}`}
@@ -97,7 +97,7 @@ export default function CalendarWidget({
         disabled={(date) => !selectableDateSet.has(toDateKey(date))}
         showOutsideDays={false}
         className="archive-calendar"
-        aria-label="Tweet archive calendar"
+        aria-label="Post archive calendar"
       />
     </div>
   );
