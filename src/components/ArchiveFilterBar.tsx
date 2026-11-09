@@ -116,7 +116,7 @@ export default function ArchiveFilterBar({
 
   return (
     <div className={cn(
-      "rounded-2xl border border-gray-100 bg-white p-3 shadow-sm dark:border-gray-800 dark:bg-[#16181c] sm:p-4",
+      "rounded-2xl border border-border bg-white p-3 shadow-sm dark:border-border dark:bg-card sm:p-4",
       isRail
         ? "mb-0 rounded-none border-0 bg-transparent p-0 shadow-none dark:bg-transparent sm:p-0"
         : "mb-4",
@@ -124,10 +124,10 @@ export default function ArchiveFilterBar({
     )}>
       {isRail ? (
         <div className="mb-3 px-1">
-          <h2 className="text-base font-bold text-gray-900 dark:text-white">筛选与排序</h2>
+          <h2 className="text-base font-bold text-foreground">筛选与排序</h2>
         </div>
       ) : null}
-      <div className="flex w-full items-center gap-2">
+      <div className={cn("flex w-full flex-col items-stretch gap-2", !isRail && "sm:flex-row sm:items-center")}>
         <Popover.Root
           open={isCalendarOpen}
           onOpenChange={(open) => {
@@ -138,17 +138,18 @@ export default function ArchiveFilterBar({
           <Popover.Trigger asChild>
             <button
               type="button"
-              className={`inline-flex min-h-10 min-w-0 flex-1 items-center gap-2 rounded-xl border px-3 text-sm font-bold outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[#008CD2]/40 ${
+              className={`inline-flex control-size min-w-0 flex-1 items-center gap-2 rounded-xl border px-3 text-sm font-bold outline-none transition-colors focus-visible:ring-2 focus-visible:ring-accent/40 ${
                 filters.from || filters.to
-                  ? "border-[#008CD2]/30 bg-[#008CD2]/10 text-[#008CD2] dark:bg-[#008CD2]/15"
-                  : "border-gray-200 bg-gray-50 text-gray-700 hover:border-[#008CD2]/30 hover:text-[#008CD2] dark:border-gray-700 dark:bg-black/20 dark:text-gray-200"
+                  ? "border-accent/30 bg-accent/10 text-accent dark:bg-accent/15"
+                  : "border-border bg-muted text-foreground hover:border-accent/30 hover:text-accent dark:border-border dark:bg-black/20 dark:text-foreground"
               }`}
               aria-label="选择日期范围"
+              title={getRangeLabel(filters)}
             >
-              <CalendarDays size={17} aria-hidden="true" />
+              <CalendarDays size={16} aria-hidden="true" />
               <span className="min-w-0 flex-1 truncate text-left">{getRangeLabel(filters)}</span>
               <ChevronDown
-                size={15}
+                size={16}
                 aria-hidden="true"
                 className={`transition-transform ${isCalendarOpen ? "rotate-180" : ""}`}
               />
@@ -160,7 +161,7 @@ export default function ArchiveFilterBar({
               align={isRail ? "end" : "start"}
               sideOffset={8}
               collisionPadding={12}
-              className="archive-filter-popover z-[110] w-[min(340px,calc(100vw-24px))] rounded-2xl border border-gray-200 bg-white/95 p-3 text-gray-900 shadow-[0_20px_60px_rgba(15,23,42,0.2)] outline-none backdrop-blur-xl dark:border-gray-700 dark:bg-[#16181c]/95 dark:text-white dark:shadow-[0_20px_60px_rgba(0,0,0,0.55)]"
+              className="archive-filter-popover z-[110] w-[min(340px,calc(100vw-24px))] rounded-2xl border border-border bg-card p-3 text-foreground shadow-sm outline-none dark:border-border dark:bg-card dark:text-white"
             >
               <DayPicker
                 mode="range"
@@ -182,18 +183,18 @@ export default function ArchiveFilterBar({
                 className="archive-calendar archive-filter-calendar"
                 aria-label="Archive date range"
               />
-              <div className="mt-2 flex items-center justify-between gap-2 border-t border-gray-100 pt-3 dark:border-gray-800">
+              <div className="mt-2 flex items-center justify-between gap-2 border-t border-border pt-3 dark:border-border">
                 <button
                   type="button"
                   onClick={() => setDraftRange(undefined)}
-                  className="rounded-lg px-3 py-2 text-sm font-bold text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-white"
+                  className="control-size rounded-lg px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-muted hover:text-foreground dark:hover:bg-muted dark:hover:text-white"
                 >
                   清除日期
                 </button>
                 <button
                   type="button"
                   onClick={applyRange}
-                  className="rounded-lg bg-[#008CD2] px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-[#007bb9]"
+                  className="control-size rounded-lg bg-accent-solid px-4 py-2 text-sm font-bold text-media-foreground transition-colors hover:bg-accent-solid/90"
                 >
                   应用
                 </button>
@@ -205,18 +206,18 @@ export default function ArchiveFilterBar({
         <Select.Root value={filters.order} onValueChange={(value) => setOrder(value as ArchiveSortOrder)}>
           <Select.Trigger
             aria-label="排序方式"
-            className="group inline-flex min-h-10 w-[112px] shrink-0 items-center justify-between gap-1 rounded-xl border border-gray-200 bg-gray-50 px-2.5 text-xs font-bold text-gray-700 outline-none transition-colors hover:border-[#008CD2]/30 hover:text-[#008CD2] focus-visible:ring-2 focus-visible:ring-[#008CD2]/40 data-[state=open]:border-[#008CD2]/30 data-[state=open]:text-[#008CD2] dark:border-gray-700 dark:bg-black/20 dark:text-gray-200"
+            className="group inline-flex control-size w-full sm:w-[128px] shrink-0 items-center justify-between gap-1 rounded-xl border border-border bg-muted px-3 text-sm font-bold text-foreground outline-none transition-colors hover:border-accent/30 hover:text-accent focus-visible:ring-2 focus-visible:ring-accent/40 data-[state=open]:border-accent/30 data-[state=open]:text-accent dark:border-border dark:bg-black/20 dark:text-foreground"
           >
-            <span className="inline-flex items-center gap-1.5">
+            <span className="inline-flex items-center gap-2">
               {filters.order === "asc" ? (
-                <ArrowUpNarrowWide size={15} aria-hidden="true" />
+                <ArrowUpNarrowWide size={16} aria-hidden="true" />
               ) : (
-                <ArrowDownWideNarrow size={15} aria-hidden="true" />
+                <ArrowDownWideNarrow size={16} aria-hidden="true" />
               )}
               {filters.order === "asc" ? "日期升序" : "日期降序"}
             </span>
             <Select.Icon asChild>
-              <ChevronDown size={14} aria-hidden="true" className="text-gray-400 transition-transform group-data-[state=open]:rotate-180" />
+              <ChevronDown size={16} aria-hidden="true" className="text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
             </Select.Icon>
           </Select.Trigger>
           <Select.Portal>
@@ -225,18 +226,18 @@ export default function ArchiveFilterBar({
               align="end"
               sideOffset={6}
               collisionPadding={12}
-              className="calendar-select-content z-[120] min-w-[132px] overflow-hidden rounded-xl border border-gray-200 bg-white/95 p-1 shadow-[0_16px_40px_rgba(15,23,42,0.16)] backdrop-blur-xl dark:border-gray-700 dark:bg-[#16181c]/95"
+              className="calendar-select-content z-[120] min-w-[132px] overflow-hidden rounded-xl border border-border bg-card p-1 shadow-sm dark:border-border dark:bg-card"
             >
               <Select.Viewport>
-                <Select.Item value="desc" className="relative flex h-9 cursor-default select-none items-center gap-2 rounded-lg px-2.5 pr-8 text-xs font-bold text-gray-700 outline-none data-[highlighted]:bg-gray-100 data-[highlighted]:text-gray-950 data-[state=checked]:bg-[#008CD2]/10 data-[state=checked]:text-[#008CD2] dark:text-gray-200 dark:data-[highlighted]:bg-gray-800 dark:data-[highlighted]:text-white">
-                  <ArrowDownWideNarrow size={15} aria-hidden="true" />
+                <Select.Item value="desc" className="relative flex control-size cursor-default select-none items-center gap-2 rounded-lg px-3 pr-8 text-sm font-bold text-foreground outline-none data-[highlighted]:bg-muted data-[highlighted]:text-foreground data-[state=checked]:bg-accent/10 data-[state=checked]:text-accent dark:text-foreground dark:data-[highlighted]:bg-muted dark:data-[highlighted]:text-white">
+                  <ArrowDownWideNarrow size={16} aria-hidden="true" />
                   <Select.ItemText>日期降序</Select.ItemText>
-                  <Select.ItemIndicator className="absolute right-2"><Check size={14} aria-hidden="true" /></Select.ItemIndicator>
+                  <Select.ItemIndicator className="absolute right-2"><Check size={16} aria-hidden="true" /></Select.ItemIndicator>
                 </Select.Item>
-                <Select.Item value="asc" className="relative flex h-9 cursor-default select-none items-center gap-2 rounded-lg px-2.5 pr-8 text-xs font-bold text-gray-700 outline-none data-[highlighted]:bg-gray-100 data-[highlighted]:text-gray-950 data-[state=checked]:bg-[#008CD2]/10 data-[state=checked]:text-[#008CD2] dark:text-gray-200 dark:data-[highlighted]:bg-gray-800 dark:data-[highlighted]:text-white">
-                  <ArrowUpNarrowWide size={15} aria-hidden="true" />
+                <Select.Item value="asc" className="relative flex control-size cursor-default select-none items-center gap-2 rounded-lg px-3 pr-8 text-sm font-bold text-foreground outline-none data-[highlighted]:bg-muted data-[highlighted]:text-foreground data-[state=checked]:bg-accent/10 data-[state=checked]:text-accent dark:text-foreground dark:data-[highlighted]:bg-muted dark:data-[highlighted]:text-white">
+                  <ArrowUpNarrowWide size={16} aria-hidden="true" />
                   <Select.ItemText>日期升序</Select.ItemText>
-                  <Select.ItemIndicator className="absolute right-2"><Check size={14} aria-hidden="true" /></Select.ItemIndicator>
+                  <Select.ItemIndicator className="absolute right-2"><Check size={16} aria-hidden="true" /></Select.ItemIndicator>
                 </Select.Item>
               </Select.Viewport>
             </Select.Content>
@@ -245,15 +246,15 @@ export default function ArchiveFilterBar({
       </div>
 
       {isPending || hasCustomFilters ? (
-        <div className="mt-2 flex min-h-8 items-center justify-end gap-2 px-1 text-xs font-medium text-gray-400">
-          {isPending ? <Loader2 size={15} className="animate-spin text-[#008CD2]" aria-label="正在更新" /> : null}
+        <div className="mt-2 flex min-h-8 items-center justify-end gap-2 px-1 text-xs font-medium text-muted-foreground">
+          {isPending ? <Loader2 size={16} className="animate-spin text-accent" aria-label="正在更新" /> : null}
           {hasCustomFilters ? (
             <button
               type="button"
               onClick={clearFilters}
-              className="inline-flex h-8 items-center gap-1 rounded-lg px-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-white"
+              className="inline-flex control-size items-center gap-1 rounded-lg px-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground dark:hover:bg-muted dark:hover:text-white"
             >
-              <RotateCcw size={14} aria-hidden="true" />
+              <RotateCcw size={16} aria-hidden="true" />
               重置
             </button>
           ) : null}

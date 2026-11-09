@@ -6,14 +6,14 @@ interface RichTextProps {
   text: string;
   className?: string;
   preventPropagation?: boolean;
-  platform?: 'twitter' | 'instagram'; 
+  platform?: 'twitter' | 'instagram';
 }
 
-export default function RichText({ 
-  text, 
-  className, 
-  preventPropagation = false, 
-  platform = 'twitter' 
+export default function RichText({
+  text,
+  className,
+  preventPropagation = false,
+  platform = 'twitter'
 }: RichTextProps) {
   if (!text) return null;
 
@@ -25,13 +25,13 @@ export default function RichText({
         if (part.match(/^@[a-zA-Z0-9_.]+$/)) {
           let username = part;
           let suffix = "";
-          
+
           if (part.endsWith('.')) {
              username = part.slice(0, -1);
              suffix = ".";
           }
-          
-          const nameContent = username.slice(1); 
+
+          const nameContent = username.slice(1);
 
           const href = platform === 'instagram'
             ? `https://www.instagram.com/${nameContent}/`
@@ -43,7 +43,7 @@ export default function RichText({
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[#008CD2] hover:underline"
+                className="text-accent hover:underline"
                 onClick={(e) => preventPropagation && e.stopPropagation()}
               >
                 {username}
@@ -55,7 +55,7 @@ export default function RichText({
 
         if (part.match(/^#[^\s!@#$%^&*(),.?":{}|<>]+$/)) {
           const hashtag = part.slice(1); // 去掉 #
-          
+
           const href = platform === 'instagram'
             ? `https://www.instagram.com/explore/tags/${hashtag}/`
             : `https://x.com/hashtag/${hashtag}`;
@@ -66,7 +66,7 @@ export default function RichText({
               href={href}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#008CD2] hover:underline"
+              className="text-accent hover:underline"
               onClick={(e) => preventPropagation && e.stopPropagation()}
             >
               {part}

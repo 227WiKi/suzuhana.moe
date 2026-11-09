@@ -1,5 +1,6 @@
 "use client";
 
+import ArchiveEmptyState from "@/components/ArchiveEmptyState";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { motion, useAnimationControls, useReducedMotion } from "framer-motion";
 import { Loader2 } from "lucide-react";
@@ -200,11 +201,11 @@ export default function TweetList({
         const query = params.toString();
         router.push(`${pathname}${query ? `?${query}` : ""}`, { scroll: false });
       }
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      window.scrollTo({ top: 0, behavior: prefersReducedMotion ? "auto" : "smooth" });
     };
     window.addEventListener(ARCHIVE_SCROLL_TO_TOP_EVENT, handleScrollToTop);
     return () => window.removeEventListener(ARCHIVE_SCROLL_TO_TOP_EVENT, handleScrollToTop);
-  }, [pathname, router, searchParams]);
+  }, [pathname, prefersReducedMotion, router, searchParams]);
 
   useEffect(() => {
     if (!targetTweetId) return;
@@ -239,7 +240,7 @@ export default function TweetList({
     const frame = requestAnimationFrame(() => {
       const element = document.getElementById(`tweet-${targetTweetId}`);
       if (!element) return;
-      alignTarget("smooth");
+      alignTarget(prefersReducedMotion ? "auto" : "smooth");
       element.classList.add("highlight-pulse");
       correctionTimers.push(
         window.setTimeout(() => alignTarget("auto"), 700),
@@ -254,7 +255,7 @@ export default function TweetList({
         window.removeEventListener(eventName, cancelCorrections);
       });
     };
-  }, [targetTweetId]);
+  }, [prefersReducedMotion, targetTweetId]);
 
   return (
     <motion.div
@@ -283,9 +284,7 @@ export default function TweetList({
       ))}
 
       {tweets.length === 0 && (
-        <div className="rounded-2xl border border-dashed border-gray-200 px-6 py-14 text-center text-sm font-medium text-gray-400 dark:border-gray-800">
-          没有符合该日期范围的贴文。
-        </div>
+        <ArchiveEmptyState message="没有符合该日期范围的贴文。" href={`/${slug}/tweets`} label="查看全部贴文" />
       )}
 
       {nextOffset !== null && (
@@ -295,7 +294,7 @@ export default function TweetList({
       )}
 
       {tweets.length > 0 && nextOffset === null && (
-        <div className="py-8 text-center text-gray-400 text-sm font-medium">
+        <div className="py-8 text-center text-muted-foreground text-sm font-medium">
           You&apos;ve reached the end of the archive.
         </div>
       )}

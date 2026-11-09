@@ -10,6 +10,8 @@ const variants = {
   exit: (direction: number) => ({ x: direction > 0 ? "-100%" : "100%", opacity: 0 }),
 };
 
+const keepJsAnimation = () => {};
+
 export default function PageTransition({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const direction = pathname.endsWith("/media") ? 1 : -1;
@@ -28,6 +30,11 @@ export default function PageTransition({ children }: { children: React.ReactNode
             x: { type: "spring", stiffness: 300, damping: 30 },
             opacity: { duration: 0.2 },
           }}
+          // Any onUpdate makes framer drive opacity from its own frame loop
+          // instead of a Web Animation. The Web Animation could finish a frame
+          // before framer wrote the final value, so both pages blinked back to
+          // their starting opacity at the end of the slide.
+          onUpdate={keepJsAnimation}
           className="row-start-1 col-start-1 w-full h-full"
         >
           <FrozenRouter>{children}</FrozenRouter>

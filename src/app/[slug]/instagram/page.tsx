@@ -1,3 +1,4 @@
+import ArchiveEmptyState from "@/components/ArchiveEmptyState";
 import { getInstagramPosts, getUserData } from "@/lib/api";
 import { notFound } from "next/navigation";
 import InstagramGrid from "@/components/InstagramGrid";
@@ -13,7 +14,7 @@ import {
 } from "@/lib/archive-filters";
 
 interface PageProps {
-  params: Promise<{ slug: string }>; 
+  params: Promise<{ slug: string }>;
   searchParams: Promise<{ from?: string; to?: string; order?: string }>;
 }
 
@@ -37,19 +38,19 @@ export default async function InstagramPage({ params, searchParams }: PageProps)
   const { minDate, maxDate } = getArchiveDateBounds(posts, (post) => post.date);
 
   return (
-    <div className="w-full max-w-5xl mx-auto px-4 py-4">
+    <div className="w-full py-4">
       <InstagramProfile userData={userData} />
 
       <ArchiveFilterBar
-        className="lg:hidden"
+        className="2xl:hidden"
         filters={filters}
         minDate={minDate}
         maxDate={maxDate}
       />
 
-      <div className="flex items-center gap-2 px-2 py-4 mb-4 border-b border-gray-100 dark:border-zinc-800">
-         <Grid size={18} className="text-gray-900 dark:text-white" />
-         <h2 className="text-sm font-bold uppercase tracking-widest text-gray-500">
+      <div className="flex items-center gap-2 px-2 py-4 mb-4 border-b border-border">
+         <Grid size={18} className="text-foreground" />
+         <h2 className="text-sm font-bold text-muted-foreground">
             Posts
          </h2>
       </div>
@@ -58,9 +59,7 @@ export default async function InstagramPage({ params, searchParams }: PageProps)
         {filteredPosts.length > 0 ? (
           <InstagramGrid posts={filteredPosts} userData={userData} />
         ) : (
-          <div className="rounded-2xl border border-dashed border-gray-200 px-6 py-14 text-center text-sm font-medium text-gray-400 dark:border-gray-800">
-            没有符合该日期范围的 Instagram 贴文。
-          </div>
+          <ArchiveEmptyState message="没有符合该日期范围的 Instagram 贴文。" href={`/${slug}/instagram`} label="查看全部贴文" />
         )}
       </FilteredArchiveResults>
     </div>

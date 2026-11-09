@@ -19,11 +19,12 @@ export default async function TwitterLayout({ children, params }: LayoutProps) {
 
   return (
     <div className="min-h-screen">
-      <div className="max-w-[600px] mx-auto min-h-screen border-gray-100 dark:border-gray-800">
-        
-        <TwitterHeader 
-          user={user} 
-          slug={slug} 
+      {/* Fill the content column so the gap to the sidebar matches the other member pages. */}
+      <div className="w-full min-h-screen">
+
+        <TwitterHeader
+          user={user}
+          slug={slug}
         />
       <PageTransition >
         {children}

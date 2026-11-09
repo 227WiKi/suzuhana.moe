@@ -41,13 +41,13 @@ export default function CalendarDropdown({
     >
       <Select.Trigger
         aria-label={ariaLabel}
-        className="group inline-flex h-8 items-center gap-1 rounded-lg px-1.5 text-sm font-bold text-gray-900 outline-none transition-colors hover:bg-gray-100 hover:text-[#008CD2] focus-visible:ring-2 focus-visible:ring-[#008CD2]/40 data-[state=open]:bg-[#008CD2]/10 data-[state=open]:text-[#008CD2] dark:text-white dark:hover:bg-gray-800 dark:data-[state=open]:bg-[#008CD2]/15"
+        className="group inline-flex control-size items-center gap-1 rounded-lg px-2 text-sm font-bold text-foreground outline-none transition-colors hover:bg-muted hover:text-accent focus-visible:ring-2 focus-visible:ring-accent/40 data-[state=open]:bg-accent/10 data-[state=open]:text-accent dark:text-white dark:hover:bg-muted dark:data-[state=open]:bg-accent/15"
       >
         <Select.Value />
         <Select.Icon asChild>
           <ChevronDown
             aria-hidden="true"
-            className="h-3.5 w-3.5 text-gray-400 transition-transform group-data-[state=open]:rotate-180 group-data-[state=open]:text-[#008CD2]"
+            className="size-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180 group-data-[state=open]:text-accent"
           />
         </Select.Icon>
       </Select.Trigger>
@@ -58,10 +58,10 @@ export default function CalendarDropdown({
           align="start"
           sideOffset={6}
           collisionPadding={12}
-          className="calendar-select-content z-[120] max-h-[280px] overflow-hidden rounded-xl border border-gray-200 bg-white/95 p-1 shadow-[0_16px_40px_rgba(15,23,42,0.16)] backdrop-blur-xl dark:border-gray-700 dark:bg-[#16181c]/95 dark:shadow-[0_16px_48px_rgba(0,0,0,0.5)]"
+          className="calendar-select-content z-[120] max-h-[280px] overflow-hidden rounded-xl border border-border bg-card p-1 shadow-sm dark:border-border dark:bg-card"
           style={{ minWidth: "var(--radix-select-trigger-width)" }}
         >
-          <Select.ScrollUpButton className="flex h-7 items-center justify-center text-gray-400">
+          <Select.ScrollUpButton className="flex h-7 items-center justify-center text-muted-foreground">
             <ChevronUp aria-hidden="true" className="h-4 w-4" />
           </Select.ScrollUpButton>
 
@@ -71,7 +71,7 @@ export default function CalendarDropdown({
                 key={option.value}
                 value={String(option.value)}
                 disabled={option.disabled}
-                className="relative flex h-9 cursor-default select-none items-center rounded-lg px-3 pr-8 text-sm font-medium text-gray-700 outline-none transition-colors data-[disabled]:pointer-events-none data-[disabled]:opacity-30 data-[highlighted]:bg-gray-100 data-[highlighted]:text-gray-950 data-[state=checked]:bg-[#008CD2]/10 data-[state=checked]:font-bold data-[state=checked]:text-[#008CD2] dark:text-gray-200 dark:data-[highlighted]:bg-gray-800 dark:data-[highlighted]:text-white dark:data-[state=checked]:bg-[#008CD2]/15 dark:data-[state=checked]:text-[#38bdf8]"
+                className="relative flex control-size cursor-default select-none items-center rounded-lg px-3 pr-8 text-sm font-medium text-foreground outline-none transition-colors data-[disabled]:pointer-events-none data-[disabled]:opacity-30 data-[highlighted]:bg-muted data-[highlighted]:text-foreground data-[state=checked]:bg-accent/10 data-[state=checked]:font-bold data-[state=checked]:text-accent dark:text-foreground dark:data-[highlighted]:bg-muted dark:data-[highlighted]:text-white dark:data-[state=checked]:bg-accent/15 dark:data-[state=checked]:text-accent"
               >
                 <Select.ItemText>{option.label}</Select.ItemText>
                 <Select.ItemIndicator className="absolute right-2 inline-flex items-center justify-center">
@@ -81,7 +81,7 @@ export default function CalendarDropdown({
             ))}
           </Select.Viewport>
 
-          <Select.ScrollDownButton className="flex h-7 items-center justify-center text-gray-400">
+          <Select.ScrollDownButton className="flex h-7 items-center justify-center text-muted-foreground">
             <ChevronDown aria-hidden="true" className="h-4 w-4" />
           </Select.ScrollDownButton>
         </Select.Content>
