@@ -413,6 +413,36 @@ body.glightbox-open {
   animation: hero-rise 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
+/* Member pages: fade a section in after switching between profile, X and
+   Instagram. A CSS animation with fill-mode both holds the end value itself,
+   so there is no gap between the animation ending and JS writing the final
+   opacity, which showed as a one-frame flash with framer-motion. */
+@keyframes section-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.section-fade-in {
+  animation: section-fade-in 0.3s ease-out both;
+}
+
+/* Page entrances. The homepage drops in from above, member pages rise from
+   below. fill-mode backwards only: once finished the animation stops applying,
+   so no transform is left behind to break the sticky sidebars or position:fixed
+   children. */
+@keyframes page-enter {
+  from { opacity: 0; scale: 0.98; translate: 0 var(--enter-y); }
+  to { opacity: 1; scale: 1; translate: 0 0; }
+}
+
+.page-enter-down,
+.page-enter-up {
+  animation: page-enter 0.5s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+.page-enter-down { --enter-y: -20px; }
+.page-enter-up { --enter-y: 20px; }
+
 /* Homepage post feed. Shuffling swaps the two cards: both pull apart, away
    from each other, change places in the stack at the widest point, then slide
    back. The new stacking order is already set in state when the shuffle
