@@ -20,7 +20,7 @@ export const MEMBERS: Member[] = [
 
     name: '白沢かなえ',
 
-    avatar: 'https://res.227wiki.eu.org/photo/avatar/graduated/kanae.jpg',
+    avatar: 'https://res.227wiki.eu.org/members/kanae/profile/avatars/graduated.jpg',
 
     accounts: {
       instagram: '__shiro227',
@@ -33,7 +33,7 @@ export const MEMBERS: Member[] = [
     
     name: '涼花萌',
     
-    avatar: 'https://res.227wiki.eu.org/photo/avatar/graduated/moe.jpg',
+    avatar: 'https://res.227wiki.eu.org/members/moe/profile/avatars/graduated.jpg',
     
     accounts: {
       twitter: 'moepiyo_227', 
@@ -46,7 +46,7 @@ export const MEMBERS: Member[] = [
   {
     name: "雨夜音",
     slug: "oto",
-    avatar: "https://res.227wiki.eu.org/photo/avatar/graduated/oto.jpg",
+    avatar: "https://res.227wiki.eu.org/members/oto/profile/avatars/graduated.jpg",
     accounts: {
       twitter: 'oto_amaya227', 
       blog: 'https://blog.227wiki.eu.org/categories/%E6%88%90%E5%91%98%E5%8D%9A%E5%AE%A2/%E9%9B%A8%E5%A4%9C%E9%9F%B3/',
